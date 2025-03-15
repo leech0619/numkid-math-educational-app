@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numkid/app/screen/comparing_screen.dart';
+import 'package:numkid/app/screen/ordering_screen.dart';
 import '../widgets/topic_button.dart';
 
 import 'counting_screen.dart';
@@ -29,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'title': 'Ordering',
       'icon': Icons.looks_3_outlined,
       'color': Colors.orange,
-      'screen': HomeScreen(),
+      'screen': OrderingScreen(),
     },
     {
       'title': 'Composing',

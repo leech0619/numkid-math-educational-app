@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CorrectDialog extends StatelessWidget {
   final String title;
   final String content;
-  final Color BackgroundColor;
+  final Color dialogBackgroundColor;
   final VoidCallback onNewGame;
   final VoidCallback onHome;
 
@@ -11,7 +11,7 @@ class CorrectDialog extends StatelessWidget {
     super.key,
     required this.title,
     required this.content,
-    required this.BackgroundColor,
+    required this.dialogBackgroundColor,
     required this.onNewGame,
     required this.onHome,
   });
@@ -19,7 +19,7 @@ class CorrectDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: BackgroundColor,
+      backgroundColor: dialogBackgroundColor,
       title: Text(
         title,
         style: TextStyle(

@@ -50,7 +50,7 @@ class _CountingScreenState extends State<CountingScreen> {
             return CorrectDialog(
               title: 'CORRECT!',
               content: 'The answer is ${_options[index]}.',
-              BackgroundColor: Colors.green,
+              dialogBackgroundColor: Colors.green,
               onNewGame: () {
                 Navigator.of(context).pop();
                 setState(() {

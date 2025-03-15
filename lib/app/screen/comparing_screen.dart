@@ -60,7 +60,7 @@ class _ComparingScreenState extends State<ComparingScreen> {
             return CorrectDialog(
               title: 'CORRECT!',
               content: '$_question1 is $comparison $_question2.',
-              BackgroundColor: Colors.red,
+              dialogBackgroundColor: Colors.red,
               onNewGame: () {
                 Navigator.of(context).pop();
                 setState(() {
