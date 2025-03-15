@@ -7,21 +7,23 @@ class FlipCardWidget extends StatelessWidget {
   final Widget back;
 
   const FlipCardWidget({
-    Key? key,
+    super.key,
     required this.controller,
     required this.front,
     required this.back,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return FlipCard(
       rotateSide: RotateSide.bottom,
-      onTapFlipping: true, // When enabled, the card will flip automatically when touched.
+      onTapFlipping:
+          true, // When enabled, the card will flip automatically when touched.
       axis: FlipAxis.horizontal,
       controller: controller,
       frontWidget: Center(
         child: Container(
+          alignment: Alignment.center,
           height: 300,
           width: 180,
           child: front,

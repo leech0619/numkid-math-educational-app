@@ -28,7 +28,7 @@ class ChoiceButton extends StatelessWidget {
           title,
           style: TextStyle(
             color: Colors.white,
-            fontSize: 50,
+            fontSize: 40,
             fontWeight: FontWeight.bold,
           ),
         ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:numkid/app/screen/comparing_screen.dart';
 import '../widgets/topic_button.dart';
 
 import 'counting_screen.dart';
@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'title': 'Comparing',
       'icon': Icons.looks_two_outlined,
       'color': Colors.red,
-      'screen': HomeScreen(),
+      'screen': ComparingScreen(),
     },
     {
       'title': 'Ordering',

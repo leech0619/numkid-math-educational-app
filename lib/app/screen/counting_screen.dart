@@ -30,7 +30,7 @@ class _CountingScreenState extends State<CountingScreen> {
     final random = Random();
     final Set<int> uniqueNumbers = {};
     while (uniqueNumbers.length < 4) {
-      uniqueNumbers.add(random.nextInt(10) + 1);
+      uniqueNumbers.add(random.nextInt(20) + 1);
     }
     _options = uniqueNumbers.toList();
     _question = _options[random.nextInt(4)];
@@ -110,7 +110,7 @@ class _CountingScreenState extends State<CountingScreen> {
               child: Center(
                 child: Text(
                   'Count the tigers!',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -119,10 +119,10 @@ class _CountingScreenState extends State<CountingScreen> {
           SizedBox(height: 10),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10),
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             child: Text(
-              'The total number of tigers is ___.\n(Hint: Click on the image)',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              'The number of tigers is ___.\n(Hint: Click on the image)',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
           ),
@@ -132,7 +132,7 @@ class _CountingScreenState extends State<CountingScreen> {
               crossAxisCount: 2,
               crossAxisSpacing: 40,
               mainAxisSpacing: 20,
-              padding: EdgeInsets.all(45),
+              padding: EdgeInsets.all(50),
               children: List.generate(_options.length, (index) {
                 final option = _options[index];
                 return ChoiceButton(

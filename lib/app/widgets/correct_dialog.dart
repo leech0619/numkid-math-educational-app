@@ -8,26 +8,24 @@ class CorrectDialog extends StatelessWidget {
   final VoidCallback onHome;
 
   const CorrectDialog({
-    Key? key,
+    super.key,
     required this.title,
     required this.content,
     required this.BackgroundColor,
     required this.onNewGame,
     required this.onHome,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: BackgroundColor,
-      title: Container(
-        child: Text(
-          title,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-          ),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 30,
+          fontWeight: FontWeight.bold,
         ),
       ),
       content: Text(
