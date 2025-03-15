@@ -6,13 +6,12 @@ import 'counting_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
-  
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Define topics for the app
   final List<Map<String, dynamic>> topics = [
     {
       'title': 'Counting',
@@ -42,16 +41,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Extract theme data
     final ThemeData theme = Theme.of(context);
     final TextTheme textTheme = theme.textTheme;
 
     return Scaffold(
       body: Stack(
         children: [
-          // Background Image for Content
           Positioned.fill(
-            top: 250, // Match the banner height
+            top: 250,
             child: Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
@@ -62,10 +59,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // Main Content
           Column(
             children: [
-              // Banner Section with Custom Shape
               ClipPath(
                 clipper: BannerClipper(),
                 child: Container(
@@ -80,10 +75,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Center(
                     child: Text(
                       'NumKid',
-                      style: textTheme.displayLarge?.copyWith(
+                      style: TextStyle(
                         fontSize: 64,
                         fontWeight: FontWeight.w600,
-                        letterSpacing: 2.0, // Add some spacing between letters
+                        letterSpacing: 2.0,
                         foreground:
                             Paint()
                               ..shader = LinearGradient(
@@ -102,7 +97,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // Topics Grid
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(15.0),
@@ -113,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisCount: 2,
                       crossAxisSpacing: 25,
                       mainAxisSpacing: 25,
-                      childAspectRatio: 1, // Square buttons
+                      childAspectRatio: 1,
                     ),
                     itemCount: topics.length,
                     itemBuilder: (context, index) {
@@ -143,16 +137,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// Custom Clipper for Banner Shape
 class BannerClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     Path path = Path();
 
-    // Start from top left
     path.lineTo(0, size.height - 50);
 
-    // Create a curved bottom edge
     path.quadraticBezierTo(
       size.width / 2,
       size.height,
@@ -160,10 +151,8 @@ class BannerClipper extends CustomClipper<Path> {
       size.height - 50,
     );
 
-    // Line to top right
     path.lineTo(size.width, 0);
 
-    // Close the path
     path.close();
 
     return path;

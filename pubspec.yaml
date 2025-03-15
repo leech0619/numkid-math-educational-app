@@ -38,6 +38,8 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  flutter_flip_card: ^0.0.6
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:
@@ -58,6 +60,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/numbers/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -91,11 +94,11 @@ flutter_native_splash:
   web: false
 
   color: "#CDF0FF"
-  image: assets/icon/icon.png
+  image: assets/icon/icon2.png
 
   android_12:
     color: "#CDF0FF"
-    image: assets/icon/icon.png
+    image: assets/icon/icon2.png
 
 
 flutter_launcher_icons:

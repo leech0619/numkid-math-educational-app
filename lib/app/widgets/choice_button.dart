@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 
-class TopicButton extends StatelessWidget {
+class ChoiceButton extends StatelessWidget {
   final String title;
-  final IconData icon;
   final Color color;
   final TextStyle? textStyle;
   final VoidCallback onPressed;
 
-  const TopicButton({
+  const ChoiceButton({
     super.key,
     required this.title,
-    required this.icon,
     required this.color,
     this.textStyle,
     required this.onPressed,
@@ -18,7 +16,6 @@ class TopicButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
@@ -26,20 +23,15 @@ class TopicButton extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         elevation: 10,
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 60, color: Colors.white),
-          SizedBox(height: 15),
-          Text(
-            title,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 25,
-              fontWeight: FontWeight.bold,
-            ),
+      child: Center(
+        child: Text(
+          title,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 50,
+            fontWeight: FontWeight.bold,
           ),
-        ],
+        ),
       ),
     );
   }

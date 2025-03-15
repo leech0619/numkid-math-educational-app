@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'util.dart';
-import 'theme.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'app/screen/home_screen.dart';
 
@@ -14,19 +13,21 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  // This widget is the root of application.
   @override
   Widget build(BuildContext context) {
-    final brightness = View.of(context).platformDispatcher.platformBrightness;
+    final TextTheme textTheme = GoogleFonts.andikaTextTheme();
 
-    // Use with Google Fonts package to use downloadable fonts
-    TextTheme textTheme = createTextTheme(context, "Andika", "Andika");
+    final ThemeData theme = ThemeData(
+      textTheme: textTheme,
+      primarySwatch: Colors.blue,
+    );
 
-    MaterialTheme theme = MaterialTheme(textTheme);
     return MaterialApp(
+      scrollBehavior: const MaterialScrollBehavior().copyWith(scrollbars: false),
       debugShowCheckedModeBanner: false,
       title: 'NumKid',
-      theme: brightness == Brightness.light ? theme.light() : theme.dark(),
+      theme: theme,
       home: HomeScreen(),
     );
   }
