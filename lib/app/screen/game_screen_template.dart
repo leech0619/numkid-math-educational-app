@@ -6,11 +6,11 @@ class GameScreenTemplate extends StatelessWidget {
   final Widget body;
 
   const GameScreenTemplate({
-    Key? key,
+    super.key,
     required this.title,
     required this.appBarColor,
     required this.body,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

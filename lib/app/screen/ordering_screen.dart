@@ -25,7 +25,11 @@ class _OrderingScreenState extends State<OrderingScreen> {
 
   void _generateRandomNumbers() {
     final random = Random();
-    _numbers = List.generate(6, (_) => random.nextInt(100) + 1);
+    final Set<int> uniqueNumbers = {};
+    while (uniqueNumbers.length < 6) {
+      uniqueNumbers.add(random.nextInt(100) + 1);
+    }
+    _numbers = uniqueNumbers.toList();
     _originalNumbers = List.from(_numbers);
     _numbers.shuffle();
     _isAscending = random.nextBool(); // Randomly set _isAscending to true or false
@@ -85,7 +89,7 @@ class _OrderingScreenState extends State<OrderingScreen> {
   @override
   Widget build(BuildContext context) {
     return GameScreenTemplate(
-      title: 'Ordering Numbers',
+      title: 'Ordering',
       appBarColor: Colors.orange,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -137,14 +141,7 @@ class _OrderingScreenState extends State<OrderingScreen> {
   }
 
   List<Widget> _buildNumberWidgets() {
-    List<Widget> widgets = [];
-    for (int i = 0; i < _numbers.length; i++) {
-      widgets.add(_buildNumberWidget(_numbers[i]));
-      if (i < _numbers.length - 1) {
-        widgets.add(_buildArrowWidget());
-      }
-    }
-    return widgets;
+    return _numbers.map((number) => _buildNumberWidget(number)).toList();
   }
 
   Widget _buildNumberWidget(int number) {
@@ -152,7 +149,6 @@ class _OrderingScreenState extends State<OrderingScreen> {
       key: ValueKey(number),
       width: 80,
       height: 80,
-      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.orangeAccent,
         border: Border.all(color: Colors.orange, width: 3),
@@ -167,14 +163,6 @@ class _OrderingScreenState extends State<OrderingScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildArrowWidget() {
-    return Icon(
-      _isAscending ? Icons.arrow_forward : Icons.arrow_back,
-      color: Colors.orange,
-      size: 30,
     );
   }
 }
