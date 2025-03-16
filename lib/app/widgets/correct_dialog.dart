@@ -18,19 +18,24 @@ class CorrectDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double titleFontSize = screenSize.width > 600 ? 30 : 24;
+    final double contentFontSize = screenSize.width > 600 ? 24 : 20;
+    final double buttonFontSize = screenSize.width > 600 ? 24 : 20;
+
     return AlertDialog(
       backgroundColor: dialogBackgroundColor,
       title: Text(
         title,
         style: TextStyle(
           color: Colors.white,
-          fontSize: 30,
+          fontSize: titleFontSize,
           fontWeight: FontWeight.bold,
         ),
       ),
       content: Text(
         content,
-        style: TextStyle(color: Colors.white, fontSize: 20),
+        style: TextStyle(color: Colors.white, fontSize: contentFontSize),
       ),
       actions: [
         TextButton(
@@ -38,7 +43,7 @@ class CorrectDialog extends StatelessWidget {
           style: TextButton.styleFrom(
             backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
-            textStyle: TextStyle(fontSize: 20),
+            textStyle: TextStyle(fontSize: buttonFontSize),
           ),
           child: Text('New Game'),
         ),
@@ -47,7 +52,7 @@ class CorrectDialog extends StatelessWidget {
           style: TextButton.styleFrom(
             backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
-            textStyle: TextStyle(fontSize: 20),
+            textStyle: TextStyle(fontSize: buttonFontSize),
           ),
           child: Text('Home'),
         ),

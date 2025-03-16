@@ -18,7 +18,14 @@ class TopicButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+    final Size screenSize = MediaQuery.of(context).size;
+    final double iconSize = screenSize.width > 600 ? 80 : 60;
+    final double fontSize =
+        screenSize.width > 600
+            ? 30
+            : screenSize.width > 400
+            ? 25
+            : 20;
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
@@ -29,13 +36,13 @@ class TopicButton extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 60, color: Colors.white),
+          Icon(icon, size: iconSize, color: Colors.white),
           SizedBox(height: 15),
           Text(
             title,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 25,
+              fontSize: fontSize,
               fontWeight: FontWeight.bold,
             ),
           ),

@@ -16,19 +16,23 @@ class ChoiceButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double fontSize = screenSize.width > 600 ? 45 : 30;
+
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         elevation: 10,
+        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
       ),
       child: Center(
         child: Text(
           title,
           style: TextStyle(
             color: Colors.white,
-            fontSize: 40,
+            fontSize: fontSize,
             fontWeight: FontWeight.bold,
           ),
         ),

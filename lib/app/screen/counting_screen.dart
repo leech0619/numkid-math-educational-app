@@ -68,8 +68,7 @@ class _CountingScreenState extends State<CountingScreen> {
       // Incorrect answer
       HapticFeedback.vibrate();
       setState(() {
-        _options[index] =
-            -1; // Temporarily set to -1 to indicate incorrect answer
+        _options[index] = -1; // Temporarily set to -1 to indicate incorrect answer
       });
       Future.delayed(Duration(seconds: 1), () {
         setState(() {
@@ -81,6 +80,11 @@ class _CountingScreenState extends State<CountingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double fontSize = screenSize.width > 600 ? 30 : 20;
+    //final double buttonWidth = screenSize.width > 600 ? 300 : 250;
+    //final double buttonHeight = screenSize.width > 600 ? 80 : 60;
+
     return GameScreenTemplate(
       title: 'Counting',
       appBarColor: Colors.green,
@@ -110,7 +114,7 @@ class _CountingScreenState extends State<CountingScreen> {
               child: Center(
                 child: Text(
                   'Count the tigers!',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                  style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, color: Colors.black),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -122,30 +126,24 @@ class _CountingScreenState extends State<CountingScreen> {
             color: Colors.white.withValues(alpha: 0.8),
             child: Text(
               'The number of tigers is ___.\n(Hint: Click on the image)',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
           ),
           Expanded(
             child: GridView.count(
               physics: NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
+              crossAxisCount: screenSize.width > 600 ? 3 : 2,
               crossAxisSpacing: 40,
               mainAxisSpacing: 20,
               padding: EdgeInsets.all(50),
               children: List.generate(_options.length, (index) {
                 final option = _options[index];
                 return ChoiceButton(
-                  title:
-                      _correctAnswers[index]
-                          ? '✓'
-                          : (option == -1 ? '❌' : option.toString()),
-                  color:
-                      _correctAnswers[index]
-                          ? Colors.lightGreenAccent
-                          : (option == -1 ? Colors.grey : Colors.green),
+                  title: _correctAnswers[index] ? '✓' : (option == -1 ? '❌' : option.toString()),
+                  color: _correctAnswers[index] ? Colors.lightGreenAccent : (option == -1 ? Colors.grey : Colors.green),
                   onPressed: () => _handleButtonPress(context, option, index),
-                  textStyle: TextStyle(fontSize: 20),
+                  textStyle: TextStyle(fontSize: fontSize),
                 );
               }),
             ),

@@ -14,19 +14,24 @@ class GameScreenTemplate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double appBarFontSize = screenSize.width > 600 ? 38 : 28;
+    final double iconSize = screenSize.width > 600 ? 38 : 28;
+    final double toolbarHeight = screenSize.width > 600 ? 80 : 60;
+
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(
           color: Colors.white,
-          size: 38,
+          size: iconSize,
         ),
-        toolbarHeight: 80,
+        toolbarHeight: toolbarHeight,
         backgroundColor: appBarColor,
         centerTitle: true,
         title: Text(
           title,
           style: TextStyle(
-            fontSize: 38,
+            fontSize: appBarFontSize,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),

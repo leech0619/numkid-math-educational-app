@@ -90,6 +90,11 @@ class _ComparingScreenState extends State<ComparingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double fontSize = screenSize.width > 600 ? 30 : 20;
+    final double buttonWidth = screenSize.width > 600 ? 320 : 280;
+    final double buttonHeight = screenSize.width > 600 ? 90 : 70;
+
     return GameScreenTemplate(
       title: 'Comparing',
       appBarColor: Colors.red,
@@ -113,7 +118,7 @@ class _ComparingScreenState extends State<ComparingScreen> {
                     child: Text(
                       '$_question1',
                       style: TextStyle(
-                        fontSize: 100,
+                        fontSize: fontSize,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
@@ -144,7 +149,7 @@ class _ComparingScreenState extends State<ComparingScreen> {
                     child: Text(
                       '$_question2',
                       style: TextStyle(
-                        fontSize: 100,
+                        fontSize: fontSize,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
@@ -170,7 +175,7 @@ class _ComparingScreenState extends State<ComparingScreen> {
             color: Colors.white.withValues(alpha: 0.8),
             child: Text(
               '$_question1 is ______ $_question2\n(Hint: Click on the image)',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
           ),
@@ -179,8 +184,8 @@ class _ComparingScreenState extends State<ComparingScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: 350,
-                  height: 80,
+                  width: buttonWidth,
+                  height: buttonHeight,
                   child: ChoiceButton(
                     title:
                         _buttonStates[0] == ''
@@ -194,13 +199,13 @@ class _ComparingScreenState extends State<ComparingScreen> {
                                 : Colors.red),
                     onPressed:
                         () => _handleButtonPress(context, 'Greater than', 0),
-                    textStyle: TextStyle(fontSize: 20),
+                    textStyle: TextStyle(fontSize: fontSize),
                   ),
                 ),
-                SizedBox(height: 25),
+                SizedBox(height: 20),
                 SizedBox(
-                  width: 350,
-                  height: 80,
+                  width: buttonWidth,
+                  height: buttonHeight,
                   child: ChoiceButton(
                     title:
                         _buttonStates[1] == '' ? 'Less than' : _buttonStates[1],
@@ -212,13 +217,13 @@ class _ComparingScreenState extends State<ComparingScreen> {
                                 : Colors.red),
                     onPressed:
                         () => _handleButtonPress(context, 'Less than', 1),
-                    textStyle: TextStyle(fontSize: 20),
+                    textStyle: TextStyle(fontSize: fontSize),
                   ),
                 ),
-                SizedBox(height: 25),
+                SizedBox(height: 20),
                 SizedBox(
-                  width: 350,
-                  height: 80,
+                  width: buttonWidth,
+                  height: buttonHeight,
                   child: ChoiceButton(
                     title:
                         _buttonStates[2] == '' ? 'Equal To' : _buttonStates[2],
@@ -229,7 +234,7 @@ class _ComparingScreenState extends State<ComparingScreen> {
                                 ? Colors.grey
                                 : Colors.red),
                     onPressed: () => _handleButtonPress(context, 'Equal To', 2),
-                    textStyle: TextStyle(fontSize: 20),
+                    textStyle: TextStyle(fontSize: fontSize),
                   ),
                 ),
               ],

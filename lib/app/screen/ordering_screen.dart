@@ -16,6 +16,10 @@ class _OrderingScreenState extends State<OrderingScreen> {
   late List<int> _numbers;
   late List<int> _originalNumbers;
   late bool _isAscending;
+  String _resultMessage = '';
+  Color _resultMessageColor = Colors.transparent;
+  String _buttonText = 'Check Order';
+  Color _buttonColor = Colors.orange;
 
   @override
   void initState() {
@@ -26,13 +30,14 @@ class _OrderingScreenState extends State<OrderingScreen> {
   void _generateRandomNumbers() {
     final random = Random();
     final Set<int> uniqueNumbers = {};
-    while (uniqueNumbers.length < 6) {
+    while (uniqueNumbers.length < 9) {
       uniqueNumbers.add(random.nextInt(100) + 1);
     }
     _numbers = uniqueNumbers.toList();
     _originalNumbers = List.from(_numbers);
     _numbers.shuffle();
-    _isAscending = random.nextBool(); // Randomly set _isAscending to true or false
+    _isAscending =
+        random.nextBool(); // Randomly set _isAscending to true or false
   }
 
   void _checkOrder() {
@@ -44,30 +49,51 @@ class _OrderingScreenState extends State<OrderingScreen> {
     }
 
     if (ListEquality().equals(_numbers, sortedNumbers)) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return CorrectDialog(
-            title: 'CORRECT!',
-            content: 'You have arranged the numbers correctly.',
-            dialogBackgroundColor: Colors.orange,
-            onNewGame: () {
-              Navigator.of(context).pop();
-              setState(() {
-                _generateRandomNumbers();
-              });
-            },
-            onHome: () {
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            },
-          );
-        },
-      );
+      setState(() {
+        _resultMessage = 'Correct!';
+        _resultMessageColor = Colors.green;
+        _buttonText = '✓';
+        _buttonColor = Colors.lightGreenAccent;
+      });
+      Future.delayed(Duration(seconds: 1), () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CorrectDialog(
+              title: 'CORRECT!',
+              content: 'You have arranged the numbers correctly.',
+              dialogBackgroundColor: Colors.orange,
+              onNewGame: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  _generateRandomNumbers();
+                  _resultMessage = '';
+                  _resultMessageColor = Colors.transparent;
+                  _buttonText = 'Check Order';
+                  _buttonColor = Colors.orange;
+                });
+              },
+              onHome: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+            );
+          },
+        );
+      });
     } else {
       String hint = _generateHint(sortedNumbers);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Incorrect order. Hint: $hint')),
-      );
+      setState(() {
+        _resultMessage = 'Hint: $hint';
+        _resultMessageColor = Colors.red;
+        _buttonText = '❌';
+        _buttonColor = Colors.grey;
+      });
+      Future.delayed(Duration(seconds: 1), () {
+        setState(() {
+          _buttonText = 'Check Order';
+          _buttonColor = Colors.orange;
+        });
+      });
     }
   }
 
@@ -91,51 +117,90 @@ class _OrderingScreenState extends State<OrderingScreen> {
     return GameScreenTemplate(
       title: 'Ordering',
       appBarColor: Colors.orange,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SizedBox(height: 20), // Add some space below the AppBar
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            color: Colors.white.withOpacity(0.8),
-            child: Text(
-              'Arrange the numbers in ${_isAscending ? 'ascending' : 'descending'} order.',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Expanded(
-            child: ReorderableWrap(
-              needsLongPressDraggable: false,
-              spacing: 10.0,
-              runSpacing: 10.0,
-              padding: EdgeInsets.all(20),
-              children: _buildNumberWidgets(),
-              onReorder: (int oldIndex, int newIndex) {
-                setState(() {
-                  if (newIndex > oldIndex) {
-                    newIndex -= 1;
-                  }
-                  final int item = _numbers.removeAt(oldIndex);
-                  _numbers.insert(newIndex, item);
-                });
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: ElevatedButton(
-              onPressed: _checkOrder,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                foregroundColor: Colors.white,
-                textStyle: TextStyle(fontSize: 20),
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          double spacing = constraints.maxWidth > 600 ? 20.0 : 10.0;
+          double runSpacing = constraints.maxWidth > 600 ? 30.0 : 20.0;
+          double padding = constraints.maxWidth > 600 ? 60.0 : 30.0;
+          double buttonWidth = constraints.maxWidth > 600 ? 300.0 : 200.0;
+          double buttonHeight = constraints.maxWidth > 600 ? 80.0 : 60.0;
+          double fontSize = constraints.maxWidth > 600 ? 25.0 : 22.0;
+          double resultFontSize = constraints.maxWidth > 600 ? 25.0 : 22.0;
+
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 20),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: padding),
+                color: Colors.white.withOpacity(0.8),
+                child: Text(
+                  'Arrange the numbers in ${_isAscending ? 'ascending' : 'descending'} order.',
+                  style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
               ),
-              child: Text('Check Order'),
-            ),
-          ),
-        ],
+              Row(
+                children: [
+                  Expanded(
+                    child: ReorderableWrap(
+                      maxMainAxisCount: 3,
+                      alignment: WrapAlignment.center,
+                      needsLongPressDraggable: false,
+                      spacing: spacing,
+                      runSpacing: runSpacing,
+                      padding: EdgeInsets.fromLTRB(padding, 40, padding, 30),
+                      children: _buildNumberWidgets(),
+                      onReorder: (int oldIndex, int newIndex) {
+                        setState(() {
+                          if (newIndex > oldIndex) {
+                            newIndex -= 1;
+                          }
+                          final int item = _numbers.removeAt(oldIndex);
+                          _numbers.insert(newIndex, item);
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(30),
+                    child: SizedBox(
+                      width: buttonWidth, // Responsive width
+                      height: buttonHeight, // Responsive height
+                      child: ElevatedButton(
+                        onPressed: _checkOrder,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _buttonColor,
+                          foregroundColor: Colors.white,
+                          textStyle: TextStyle(fontSize: 20),
+                        ),
+                        child: Text(_buttonText),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white.withOpacity(0.8),
+                    child: Text(
+                      _resultMessage,
+                      style: TextStyle(
+                        fontSize: resultFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: _resultMessageColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -157,10 +222,7 @@ class _OrderingScreenState extends State<OrderingScreen> {
       child: Center(
         child: Text(
           '$number',
-          style: TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
       ),
     );
