@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:numkid/app/screen/comparing_screen.dart';
 import 'package:numkid/app/screen/ordering_screen.dart';
 import '../widgets/topic_button.dart';
-
 import 'counting_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -44,12 +43,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final TextTheme textTheme = theme.textTheme;
+    final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
       body: Stack(
         children: [
           Positioned.fill(
-            top: 250,
+            top: screenSize.height * 0.1,
             child: Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
@@ -59,14 +59,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-
           Column(
             children: [
               ClipPath(
                 clipper: BannerClipper(),
                 child: Container(
                   width: double.infinity,
-                  height: 300,
+                  height: screenSize.height * 0.3,
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage('assets/images/banner_background.jpg'),
@@ -77,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(
                       'NumKid',
                       style: TextStyle(
-                        fontSize: 64,
+                        fontSize: screenSize.width * 0.1,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 2.0,
                         foreground:
@@ -97,15 +96,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: GridView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: BouncingScrollPhysics(),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
+                      crossAxisCount: screenSize.width > 600 ? 3 : 2,
                       crossAxisSpacing: 25,
                       mainAxisSpacing: 25,
                       childAspectRatio: 1,
