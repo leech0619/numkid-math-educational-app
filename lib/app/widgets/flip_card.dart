@@ -15,25 +15,28 @@ class FlipCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double cardHeight = screenSize.height * 0.33;
+    final double cardWidth = screenSize.width * 0.4;
+
     return FlipCard(
       rotateSide: RotateSide.bottom,
-      onTapFlipping:
-          true, // When enabled, the card will flip automatically when touched.
+      onTapFlipping: true, // When enabled, the card will flip automatically when touched.
       axis: FlipAxis.horizontal,
       controller: controller,
       frontWidget: Center(
         child: Container(
           alignment: Alignment.center,
-          height: 300,
-          width: 180,
+          height: cardHeight,
+          width: cardWidth,
           child: front,
         ),
       ),
       backWidget: Center(
         child: Container(
           alignment: Alignment.center,
-          height: 300,
-          width: 180,
+          height: cardHeight,
+          width: cardWidth,
           child: back,
         ),
       ),
