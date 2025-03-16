@@ -58,6 +58,7 @@ class _OrderingScreenState extends State<OrderingScreen> {
       Future.delayed(Duration(seconds: 1), () {
         showDialog(
           context: context,
+          barrierDismissible: false,
           builder: (BuildContext context) {
             return CorrectDialog(
               title: 'CORRECT!',
@@ -124,8 +125,8 @@ class _OrderingScreenState extends State<OrderingScreen> {
           double padding = constraints.maxWidth > 600 ? 60.0 : 30.0;
           double buttonWidth = constraints.maxWidth > 600 ? 300.0 : 200.0;
           double buttonHeight = constraints.maxWidth > 600 ? 80.0 : 60.0;
-          double fontSize = constraints.maxWidth > 600 ? 25.0 : 22.0;
-          double resultFontSize = constraints.maxWidth > 600 ? 25.0 : 22.0;
+          double fontSize = constraints.maxWidth > 600 ? 30 : constraints.maxWidth > 400 ? 25 : 20;
+          double resultFontSize = constraints.maxWidth > 600 ? 30 : constraints.maxWidth > 400 ? 25 : 20;
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -134,69 +135,75 @@ class _OrderingScreenState extends State<OrderingScreen> {
               SizedBox(height: 20),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: padding),
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 child: Text(
                   'Arrange the numbers in ${_isAscending ? 'ascending' : 'descending'} order.',
-                  style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.bold,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
-              Row(
-                children: [
-                  Expanded(
-                    child: ReorderableWrap(
-                      maxMainAxisCount: 3,
-                      alignment: WrapAlignment.center,
-                      needsLongPressDraggable: false,
-                      spacing: spacing,
-                      runSpacing: runSpacing,
-                      padding: EdgeInsets.fromLTRB(padding, 40, padding, 30),
-                      children: _buildNumberWidgets(),
-                      onReorder: (int oldIndex, int newIndex) {
-                        setState(() {
-                          if (newIndex > oldIndex) {
-                            newIndex -= 1;
-                          }
-                          final int item = _numbers.removeAt(oldIndex);
-                          _numbers.insert(newIndex, item);
-                        });
-                      },
-                    ),
-                  ),
-                ],
+              Container(
+                alignment: Alignment.center,
+                child: ReorderableWrap(
+                  maxMainAxisCount: 3,
+                  alignment: WrapAlignment.center,
+                  needsLongPressDraggable: false,
+                  spacing: spacing,
+                  runSpacing: runSpacing,
+                  padding: EdgeInsets.fromLTRB(padding, 40, padding, 30),
+                  children: _buildNumberWidgets(),
+                  onReorder: (int oldIndex, int newIndex) {
+                    setState(() {
+                      if (newIndex > oldIndex) {
+                        newIndex -= 1;
+                      }
+                      final int item = _numbers.removeAt(oldIndex);
+                      _numbers.insert(newIndex, item);
+                    });
+                  },
+                ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(30),
-                    child: SizedBox(
-                      width: buttonWidth, // Responsive width
-                      height: buttonHeight, // Responsive height
-                      child: ElevatedButton(
-                        onPressed: _checkOrder,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _buttonColor,
-                          foregroundColor: Colors.white,
-                          textStyle: TextStyle(fontSize: 20),
-                        ),
-                        child: Text(_buttonText),
-                      ),
+              Container(
+                padding: EdgeInsets.all(30),
+                child: SizedBox(
+                  width: buttonWidth, // Responsive width
+                  height: buttonHeight, // Responsive height
+                  child: ElevatedButton(
+                    onPressed: _checkOrder,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _buttonColor,
+                      foregroundColor: Colors.white,
+                      textStyle: TextStyle(fontSize: 20),
                     ),
+                    child: Text(_buttonText),
                   ),
-                  Container(
-                    color: Colors.white.withOpacity(0.8),
-                    child: Text(
-                      _resultMessage,
-                      style: TextStyle(
-                        fontSize: resultFontSize,
-                        fontWeight: FontWeight.bold,
-                        color: _resultMessageColor,
-                      ),
+                ),
+              ),
+              Visibility(
+                visible:
+                    _resultMessage
+                        .isNotEmpty, // Show only when _resultMessage is not empty
+                child: Container(
+                  color: Colors.white.withOpacity(
+                    0.8,
+                  ), // Use withOpacity instead of withValues
+                  padding: EdgeInsets.all(
+                    10,
+                  ), // Add padding for better appearance
+                  alignment: Alignment.center, // Ensure text is centered
+                  child: Text(
+                    _resultMessage,
+                    style: TextStyle(
+                      fontSize: resultFontSize,
+                      fontWeight: FontWeight.bold,
+                      color: _resultMessageColor,
                     ),
+                    textAlign: TextAlign.center,
                   ),
-                ],
+                ),
               ),
             ],
           );

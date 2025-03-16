@@ -45,6 +45,7 @@ class _CountingScreenState extends State<CountingScreen> {
       });
       Future.delayed(Duration(seconds: 1), () {
         showDialog(
+          barrierDismissible: false,
           context: context,
           builder: (BuildContext context) {
             return CorrectDialog(
@@ -68,7 +69,8 @@ class _CountingScreenState extends State<CountingScreen> {
       // Incorrect answer
       HapticFeedback.vibrate();
       setState(() {
-        _options[index] = -1; // Temporarily set to -1 to indicate incorrect answer
+        _options[index] =
+            -1; // Temporarily set to -1 to indicate incorrect answer
       });
       Future.delayed(Duration(seconds: 1), () {
         setState(() {
@@ -114,7 +116,11 @@ class _CountingScreenState extends State<CountingScreen> {
               child: Center(
                 child: Text(
                   'Count the tigers!',
-                  style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, color: Colors.black),
+                  style: TextStyle(
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -140,8 +146,14 @@ class _CountingScreenState extends State<CountingScreen> {
               children: List.generate(_options.length, (index) {
                 final option = _options[index];
                 return ChoiceButton(
-                  title: _correctAnswers[index] ? '✓' : (option == -1 ? '❌' : option.toString()),
-                  color: _correctAnswers[index] ? Colors.lightGreenAccent : (option == -1 ? Colors.grey : Colors.green),
+                  title:
+                      _correctAnswers[index]
+                          ? '✓'
+                          : (option == -1 ? '❌' : option.toString()),
+                  color:
+                      _correctAnswers[index]
+                          ? Colors.lightGreenAccent
+                          : (option == -1 ? Colors.grey : Colors.green),
                   onPressed: () => _handleButtonPress(context, option, index),
                   textStyle: TextStyle(fontSize: fontSize),
                 );

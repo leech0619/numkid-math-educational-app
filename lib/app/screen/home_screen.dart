@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numkid/app/screen/comparing_screen.dart';
+import 'package:numkid/app/screen/composing_screen.dart';
 import 'package:numkid/app/screen/ordering_screen.dart';
 import '../widgets/topic_button.dart';
 import 'counting_screen.dart';
@@ -35,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'title': 'Composing',
       'icon': Icons.looks_4_outlined,
       'color': Colors.purple,
-      'screen': HomeScreen(),
+      'screen': ComposingScreen(),
     },
   ];
 
@@ -76,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(
                       'NumKid',
                       style: TextStyle(
-                        fontSize: screenSize.width * 0.1,
+                        fontSize: screenSize.width * 0.14,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 2.0,
                         foreground:
@@ -128,6 +129,28 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+              Container(
+                decoration: BoxDecoration(
+                  color:
+                      Colors
+                          .lightBlueAccent
+                          .shade100, // Move color inside BoxDecoration
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                ),
+                padding: const EdgeInsets.all(10),
+                child: const Text(
+                  'Developed by Chorng Huah. All rights reserved.',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign:
+                      TextAlign.center, // Ensures text is centered properly
+                ),
+              ),
+
+              SizedBox(height: 10),
             ],
           ),
         ],

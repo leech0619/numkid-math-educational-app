@@ -55,6 +55,7 @@ class _ComparingScreenState extends State<ComparingScreen> {
       });
       Future.delayed(Duration(seconds: 1), () {
         showDialog(
+          barrierDismissible: false,
           context: context,
           builder: (BuildContext context) {
             return CorrectDialog(

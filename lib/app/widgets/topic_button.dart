@@ -25,7 +25,7 @@ class TopicButton extends StatelessWidget {
             ? 30
             : screenSize.width > 400
             ? 25
-            : 20;
+            : 18;
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
