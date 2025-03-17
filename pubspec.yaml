@@ -63,6 +63,7 @@ flutter:
   assets:
     - assets/images/
     - assets/numbers/
+    - assets/icon/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -106,6 +107,6 @@ flutter_native_splash:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: "AppIcon"
-  image_path: "assets/icon/icon.png"
+  image_path: "assets/icon/icon2.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
   remove_alpha_ios: true
