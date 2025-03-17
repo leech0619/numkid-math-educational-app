@@ -22,9 +22,9 @@ class TopicButton extends StatelessWidget {
     final double iconSize = screenSize.width > 600 ? 80 : 60;
     final double fontSize =
         screenSize.width > 600
-            ? 30
+            ? 26
             : screenSize.width > 400
-            ? 25
+            ? 22
             : 18;
     return ElevatedButton(
       onPressed: onPressed,
