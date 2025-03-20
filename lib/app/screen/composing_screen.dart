@@ -27,17 +27,17 @@ class _ComposingScreenState extends State<ComposingScreen> {
   void generateNewProblem() {
     final random = Random();
     targetNumber = random.nextInt(
-      101,
-    ); // Ensure target number is between 0 and 100
+      100,
+    ); // Ensure target number is between 0 and 99
 
     // Ensure at least one pair of numbers adds up to the target number
     int num1 = random.nextInt(targetNumber + 1);
     int num2 = targetNumber - num1;
 
-    // Generate 4 additional random numbers in the range 0 to 100
+    // Generate 4 additional random numbers in the range 0 to 99
     Set<int> uniqueNumbers = {num1, num2};
     while (uniqueNumbers.length < 6) {
-      uniqueNumbers.add(random.nextInt(101));
+      uniqueNumbers.add(random.nextInt(100));
     }
     choices = uniqueNumbers.toList()..shuffle();
 

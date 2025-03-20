@@ -93,6 +93,7 @@ class _ComparingScreenState extends State<ComparingScreen> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final double fontSize = screenSize.width > 600 ? 30 : 20;
+    final double flipFont = screenSize.width > 600 ? 40 : 30;
     final double buttonWidth = screenSize.width > 600 ? 320 : 280;
     final double buttonHeight = screenSize.width > 600 ? 90 : 70;
 
@@ -119,7 +120,7 @@ class _ComparingScreenState extends State<ComparingScreen> {
                     child: Text(
                       '$_question1',
                       style: TextStyle(
-                        fontSize: fontSize,
+                        fontSize: flipFont,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
@@ -150,7 +151,7 @@ class _ComparingScreenState extends State<ComparingScreen> {
                     child: Text(
                       '$_question2',
                       style: TextStyle(
-                        fontSize: fontSize,
+                        fontSize: flipFont,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,

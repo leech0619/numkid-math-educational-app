@@ -22,7 +22,7 @@ class ChoiceButton extends StatelessWidget {
             ? 45
             : screenSize.width > 400
             ? 30
-            : 20;
+            : 22;
 
     return ElevatedButton(
       onPressed: onPressed,
