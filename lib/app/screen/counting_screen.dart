@@ -1,11 +1,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'game_screen_template.dart'; // Import the GameScreenTemplate
-import '../widgets/choice_button.dart'; // Import the ChoiceButton
-import '../widgets/flip_card.dart'; // Import the FlipCardWidget
-import 'package:flutter_flip_card/flutter_flip_card.dart'; // Import the flutter_flip_card package
-import '../widgets/correct_dialog.dart'; // Import the CorrectDialog
+import 'game_screen_template.dart';
+import '../widgets/choice_button.dart';
+import '../widgets/flip_card.dart';
+import 'package:flutter_flip_card/flutter_flip_card.dart';
+import '../widgets/correct_dialog.dart';
 
 class CountingScreen extends StatefulWidget {
   const CountingScreen({super.key});
@@ -26,6 +26,7 @@ class _CountingScreenState extends State<CountingScreen> {
     _generateRandomNumbers();
   }
 
+  // Generates random numbers for the options and selects a random question
   void _generateRandomNumbers() {
     final random = Random();
     final Set<int> uniqueNumbers = {};
@@ -37,9 +38,9 @@ class _CountingScreenState extends State<CountingScreen> {
     _correctAnswers = List.filled(4, false);
   }
 
+  // Handles button press events and checks if the selected option is correct
   void _handleButtonPress(BuildContext context, int option, int index) {
     if (option == _question) {
-      // Correct answer
       setState(() {
         _correctAnswers[index] = true;
       });
@@ -66,15 +67,12 @@ class _CountingScreenState extends State<CountingScreen> {
         );
       });
     } else {
-      // Incorrect answer
-      HapticFeedback.vibrate();
       setState(() {
-        _options[index] =
-            -1; // Temporarily set to -1 to indicate incorrect answer
+        _options[index] = -1;
       });
       Future.delayed(Duration(seconds: 1), () {
         setState(() {
-          _options[index] = option; // Revert back to original option
+          _options[index] = option;
         });
       });
     }
@@ -84,8 +82,6 @@ class _CountingScreenState extends State<CountingScreen> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final double fontSize = screenSize.width > 600 ? 30 : 20;
-    //final double buttonWidth = screenSize.width > 600 ? 300 : 250;
-    //final double buttonHeight = screenSize.width > 600 ? 80 : 60;
 
     return GameScreenTemplate(
       title: 'Counting',
@@ -93,7 +89,8 @@ class _CountingScreenState extends State<CountingScreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(height: 20), // Add some space below the AppBar
+          SizedBox(height: 20),
+          // Flip card displaying the question
           FlipCardWidget(
             controller: _controller,
             front: Container(
@@ -127,6 +124,7 @@ class _CountingScreenState extends State<CountingScreen> {
             ),
           ),
           SizedBox(height: 10),
+          // Hint message for the user
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10),
             color: Colors.white.withValues(alpha: 0.8),
@@ -136,6 +134,7 @@ class _CountingScreenState extends State<CountingScreen> {
               textAlign: TextAlign.center,
             ),
           ),
+          // Grid of choice buttons
           Expanded(
             child: GridView.count(
               physics: NeverScrollableScrollPhysics(),

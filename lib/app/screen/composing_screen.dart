@@ -1,8 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'game_screen_template.dart'; // Import the GameScreenTemplate
-import '../widgets/choice_button.dart'; // Import the ChoiceButton
-import '../widgets/correct_dialog.dart'; // Import the CorrectDialog
+import 'game_screen_template.dart';
+import '../widgets/choice_button.dart';
+import '../widgets/correct_dialog.dart';
 
 class ComposingScreen extends StatefulWidget {
   const ComposingScreen({super.key});
@@ -16,7 +16,7 @@ class _ComposingScreenState extends State<ComposingScreen> {
   late List<int> choices;
   List<int> selectedNumbers = [];
   late List<bool?> _correctAnswers;
-  String _hintMessage = ''; // Add this line
+  String _hintMessage = '';
 
   @override
   void initState() {
@@ -24,17 +24,16 @@ class _ComposingScreenState extends State<ComposingScreen> {
     generateNewProblem();
   }
 
+  // Generates a new problem with a target number and choices
   void generateNewProblem() {
     final random = Random();
-    targetNumber = random.nextInt(
-      100,
-    ); // Ensure target number is between 0 and 99
+    targetNumber = random.nextInt(100); // Random target number between 0 and 99
 
-    // Ensure at least one pair of numbers adds up to the target number
+    // Generate two numbers that add up to the target number
     int num1 = random.nextInt(targetNumber + 1);
     int num2 = targetNumber - num1;
 
-    // Generate 4 additional random numbers in the range 0 to 99
+    // Ensure there are at least 6 unique numbers in the choices
     Set<int> uniqueNumbers = {num1, num2};
     while (uniqueNumbers.length < 6) {
       uniqueNumbers.add(random.nextInt(100));
@@ -43,9 +42,10 @@ class _ComposingScreenState extends State<ComposingScreen> {
 
     selectedNumbers.clear();
     _correctAnswers = List.filled(6, null);
-    _hintMessage = ''; // Reset hint message
+    _hintMessage = '';
   }
 
+  // Checks if the selected numbers add up to the target number
   void checkAnswer() {
     if (selectedNumbers.length == 2) {
       final sum = selectedNumbers[0] + selectedNumbers[1];
@@ -75,6 +75,7 @@ class _ComposingScreenState extends State<ComposingScreen> {
     }
   }
 
+  // Handles button press events and updates the state accordingly
   void _handleButtonPress(BuildContext context, int number, int index) {
     if (selectedNumbers.contains(number)) {
       setState(() {
@@ -92,7 +93,7 @@ class _ComposingScreenState extends State<ComposingScreen> {
           setState(() {
             _correctAnswers[choices.indexOf(selectedNumbers[0])] = true;
             _correctAnswers[choices.indexOf(selectedNumbers[1])] = true;
-            _hintMessage = 'CORRECT!'; // Set hint message
+            _hintMessage = 'CORRECT!';
           });
           Future.delayed(Duration(seconds: 1), () {
             checkAnswer();
@@ -102,7 +103,7 @@ class _ComposingScreenState extends State<ComposingScreen> {
             _correctAnswers[choices.indexOf(selectedNumbers[0])] = false;
             _correctAnswers[choices.indexOf(selectedNumbers[1])] = false;
             _hintMessage =
-                'The sum of ${selectedNumbers[0]} and ${selectedNumbers[1]} is not $targetNumber.'; // Set hint message
+                'The sum of ${selectedNumbers[0]} and ${selectedNumbers[1]} is not $targetNumber.';
           });
           Future.delayed(Duration(seconds: 1), () {
             setState(() {
@@ -138,7 +139,7 @@ class _ComposingScreenState extends State<ComposingScreen> {
               SizedBox(height: spacing),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: spacing),
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 child: Text(
                   'Select two numbers that add up to the target number.',
                   style: TextStyle(
@@ -166,6 +167,7 @@ class _ComposingScreenState extends State<ComposingScreen> {
                 ),
               ),
               SizedBox(height: spacing),
+              // Grid of choice buttons
               GridView.count(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
@@ -194,9 +196,10 @@ class _ComposingScreenState extends State<ComposingScreen> {
                   );
                 }),
               ),
+              // Hint message for the user
               if (_hintMessage.isNotEmpty)
                 Container(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   child: Text(
                     _hintMessage,

@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:reorderables/reorderables.dart'; // Import the reorderables package
-import 'game_screen_template.dart'; // Import the GameScreenTemplate
-import 'package:collection/collection.dart'; // Import the collection package
-import '../widgets/correct_dialog.dart'; // Import the CorrectDialog
+import 'package:reorderables/reorderables.dart';
+import 'game_screen_template.dart';
+import 'package:collection/collection.dart';
+import '../widgets/correct_dialog.dart';
 
 class OrderingScreen extends StatefulWidget {
   const OrderingScreen({super.key});
@@ -13,20 +13,21 @@ class OrderingScreen extends StatefulWidget {
 }
 
 class _OrderingScreenState extends State<OrderingScreen> {
-  late List<int> _numbers;
-  late List<int> _originalNumbers;
-  late bool _isAscending;
-  String _resultMessage = '';
-  Color _resultMessageColor = Colors.transparent;
-  String _buttonText = 'Check Order';
-  Color _buttonColor = Colors.orange;
+  late List<int> _numbers; // List of numbers to be ordered
+  late List<int> _originalNumbers; // Original list of numbers
+  late bool _isAscending; // Boolean to determine if the order is ascending
+  String _resultMessage = ''; // Result message to display
+  Color _resultMessageColor = Colors.transparent; // Color of the result message
+  String _buttonText = 'Check Order'; // Text of the check order button
+  Color _buttonColor = Colors.orange; // Color of the check order button
 
   @override
   void initState() {
     super.initState();
-    _generateRandomNumbers();
+    _generateRandomNumbers(); // Generate random numbers when the screen is initialized
   }
 
+  // Generates a list of random numbers and shuffles them
   void _generateRandomNumbers() {
     final random = Random();
     final Set<int> uniqueNumbers = {};
@@ -36,10 +37,10 @@ class _OrderingScreenState extends State<OrderingScreen> {
     _numbers = uniqueNumbers.toList();
     _originalNumbers = List.from(_numbers);
     _numbers.shuffle();
-    _isAscending =
-        random.nextBool(); // Randomly set _isAscending to true or false
+    _isAscending = random.nextBool();
   }
 
+  // Checks if the numbers are in the correct order
   void _checkOrder() {
     List<int> sortedNumbers = List.from(_originalNumbers);
     if (!_isAscending) {
@@ -98,6 +99,7 @@ class _OrderingScreenState extends State<OrderingScreen> {
     }
   }
 
+  // Generates a hint message to help the user
   String _generateHint(List<int> sortedNumbers) {
     for (int i = 0; i < _numbers.length - 1; i++) {
       if (_isAscending) {
@@ -125,8 +127,18 @@ class _OrderingScreenState extends State<OrderingScreen> {
           double padding = constraints.maxWidth > 600 ? 60.0 : 30.0;
           double buttonWidth = constraints.maxWidth > 600 ? 300.0 : 200.0;
           double buttonHeight = constraints.maxWidth > 600 ? 80.0 : 60.0;
-          double fontSize = constraints.maxWidth > 600 ? 30 : constraints.maxWidth > 400 ? 25 : 20;
-          double resultFontSize = constraints.maxWidth > 600 ? 30 : constraints.maxWidth > 400 ? 25 : 20;
+          double fontSize =
+              constraints.maxWidth > 600
+                  ? 30
+                  : constraints.maxWidth > 400
+                  ? 25
+                  : 20;
+          double resultFontSize =
+              constraints.maxWidth > 600
+                  ? 30
+                  : constraints.maxWidth > 400
+                  ? 25
+                  : 20;
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -169,8 +181,8 @@ class _OrderingScreenState extends State<OrderingScreen> {
               Container(
                 padding: EdgeInsets.all(30),
                 child: SizedBox(
-                  width: buttonWidth, // Responsive width
-                  height: buttonHeight, // Responsive height
+                  width: buttonWidth,
+                  height: buttonHeight,
                   child: ElevatedButton(
                     onPressed: _checkOrder,
                     style: ElevatedButton.styleFrom(
@@ -183,17 +195,11 @@ class _OrderingScreenState extends State<OrderingScreen> {
                 ),
               ),
               Visibility(
-                visible:
-                    _resultMessage
-                        .isNotEmpty, // Show only when _resultMessage is not empty
+                visible: _resultMessage.isNotEmpty,
                 child: Container(
-                  color: Colors.white.withOpacity(
-                    0.8,
-                  ), // Use withOpacity instead of withValues
-                  padding: EdgeInsets.all(
-                    10,
-                  ), // Add padding for better appearance
-                  alignment: Alignment.center, // Ensure text is centered
+                  color: Colors.white.withValues(alpha: 0.8),
+                  padding: EdgeInsets.all(10),
+                  alignment: Alignment.center,
                   child: Text(
                     _resultMessage,
                     style: TextStyle(
@@ -212,10 +218,12 @@ class _OrderingScreenState extends State<OrderingScreen> {
     );
   }
 
+  // Builds the list of number widgets
   List<Widget> _buildNumberWidgets() {
     return _numbers.map((number) => _buildNumberWidget(number)).toList();
   }
 
+  // Builds a single number widget
   Widget _buildNumberWidget(int number) {
     return Container(
       key: ValueKey(number),

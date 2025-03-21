@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class ChoiceButton extends StatelessWidget {
-  final String title;
-  final Color color;
-  final TextStyle? textStyle;
-  final VoidCallback onPressed;
+  final String title; // Title of the button
+  final Color color; // Background color of the button
+  final TextStyle? textStyle; // Text style for the button title
+  final VoidCallback onPressed; // Callback function when the button is pressed
 
   const ChoiceButton({
     super.key,
@@ -22,23 +22,28 @@ class ChoiceButton extends StatelessWidget {
             ? 45
             : screenSize.width > 400
             ? 30
-            : 22;
+            : 22; // Font size based on screen width
 
     return ElevatedButton(
-      onPressed: onPressed,
+      onPressed: onPressed, // Set the callback function for button press
       style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        elevation: 10,
-        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+        backgroundColor: color, // Set the background color of the button
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ), // Set the shape and border radius of the button
+        elevation: 10, // Set the elevation of the button
+        padding: EdgeInsets.symmetric(
+          vertical: 15,
+          horizontal: 20,
+        ), // Set the padding inside the button
       ),
       child: Center(
         child: Text(
-          title,
+          title, // Set the title of the button
           style: TextStyle(
-            color: Colors.white,
-            fontSize: fontSize,
-            fontWeight: FontWeight.bold,
+            color: Colors.white, // Set the text color to white
+            fontSize: fontSize, // Set the font size
+            fontWeight: FontWeight.bold, // Set the font weight to bold
           ),
         ),
       ),

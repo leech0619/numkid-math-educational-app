@@ -13,6 +13,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // List of topics with their respective titles, icons, colors, and screens
   final List<Map<String, dynamic>> topics = [
     {
       'title': 'Counting',
@@ -49,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: Stack(
         children: [
+          // Background image for the content area
           Positioned.fill(
             top: screenSize.height * 0.1,
             child: Container(
@@ -62,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Column(
             children: [
+              // Banner at the top of the screen
               ClipPath(
                 clipper: BannerClipper(),
                 child: Container(
@@ -97,6 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+              // Grid of topic buttons
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(15.0),
@@ -129,12 +133,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+              // Footer with developer information
               Container(
                 decoration: BoxDecoration(
-                  color:
-                      Colors
-                          .lightBlueAccent
-                          .shade100, // Move color inside BoxDecoration
+                  color: Colors.lightBlueAccent.shade100,
                   borderRadius: const BorderRadius.all(Radius.circular(20)),
                 ),
                 padding: const EdgeInsets.all(10),
@@ -145,11 +147,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
-                  textAlign:
-                      TextAlign.center, // Ensures text is centered properly
+                  textAlign: TextAlign.center,
                 ),
               ),
-
               SizedBox(height: 10),
             ],
           ),
@@ -159,6 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+// Custom clipper for the banner at the top of the screen
 class BannerClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

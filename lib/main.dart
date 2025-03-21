@@ -6,31 +6,33 @@ import 'app/screen/home_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(const MyApp());
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]); // Lock the orientation to portrait mode
+  runApp(const MyApp()); // Run the MyApp widget
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of application.
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = GoogleFonts.andikaTextTheme();
+    final TextTheme textTheme =
+        GoogleFonts.andikaTextTheme(); // Use Google Fonts for text theme
 
     final ThemeData theme = ThemeData(
-      textTheme: textTheme,
-      primarySwatch: Colors.blue,
+      textTheme: textTheme, // Set the text theme
+      primarySwatch: Colors.blue, // Set the primary color swatch
     );
 
     return MaterialApp(
-      scrollBehavior: const MaterialScrollBehavior().copyWith(scrollbars: false),
-      debugShowCheckedModeBanner: false,
-      title: 'NumKid',
-      theme: theme,
-      home: HomeScreen(),
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
+        scrollbars: false,
+      ), // Disable scrollbars
+      debugShowCheckedModeBanner: false, // Disable the debug banner
+      title: 'NumKid', // Set the title of the app
+      theme: theme, // Set the theme of the app
+      home: HomeScreen(), // Set the home screen of the app
     );
   }
 }
-
-

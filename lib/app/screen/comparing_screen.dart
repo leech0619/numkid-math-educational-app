@@ -1,11 +1,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'game_screen_template.dart'; // Import the GameScreenTemplate
-import '../widgets/choice_button.dart'; // Import the ChoiceButton
-import '../widgets/flip_card.dart'; // Import the FlipCardWidget
-import 'package:flutter_flip_card/flutter_flip_card.dart'; // Import the flutter_flip_card package
-import '../widgets/correct_dialog.dart'; // Import the CorrectDialog
+import 'game_screen_template.dart';
+import '../widgets/choice_button.dart';
+import '../widgets/flip_card.dart';
+import 'package:flutter_flip_card/flutter_flip_card.dart';
+import '../widgets/correct_dialog.dart';
 
 class ComparingScreen extends StatefulWidget {
   const ComparingScreen({super.key});
@@ -27,13 +27,15 @@ class _ComparingScreenState extends State<ComparingScreen> {
     _generateRandomNumbers();
   }
 
+  // Generates random numbers for the comparison questions
   void _generateRandomNumbers() {
     final random = Random();
     _question1 = random.nextInt(20) + 1;
     _question2 = random.nextInt(20) + 1;
-    _buttonStates = List.filled(3, ''); // Initialize button states
+    _buttonStates = List.filled(3, '');
   }
 
+  // Handles button press events and checks if the selected option is correct
   void _handleButtonPress(BuildContext context, String option, int index) {
     bool isCorrect = false;
     String comparison = '';
@@ -49,7 +51,7 @@ class _ComparingScreenState extends State<ComparingScreen> {
     }
 
     if (isCorrect) {
-      // Correct answer
+      // If the answer is correct, update the button state and show a dialog
       setState(() {
         _buttonStates[index] = '✓';
       });
@@ -76,14 +78,13 @@ class _ComparingScreenState extends State<ComparingScreen> {
         );
       });
     } else {
-      // Incorrect answer
-      HapticFeedback.vibrate();
+      // If the answer is incorrect, provide feedback and reset the button state
       setState(() {
-        _buttonStates[index] = '❌'; // Indicate incorrect answer
+        _buttonStates[index] = '❌';
       });
       Future.delayed(Duration(seconds: 1), () {
         setState(() {
-          _buttonStates[index] = ''; // Revert back to original state
+          _buttonStates[index] = '';
         });
       });
     }
@@ -103,10 +104,11 @@ class _ComparingScreenState extends State<ComparingScreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(height: 20), // Add some space below the AppBar
+          SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              // First flip card displaying the first question number
               FlipCardWidget(
                 controller: _controller1,
                 front: Container(
@@ -138,6 +140,7 @@ class _ComparingScreenState extends State<ComparingScreen> {
                   ),
                 ),
               ),
+              // Second flip card displaying the second question number
               FlipCardWidget(
                 controller: _controller2,
                 front: Container(
@@ -172,6 +175,7 @@ class _ComparingScreenState extends State<ComparingScreen> {
             ],
           ),
           SizedBox(height: 10),
+          // Hint message for the user
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10),
             color: Colors.white.withValues(alpha: 0.8),
@@ -181,6 +185,7 @@ class _ComparingScreenState extends State<ComparingScreen> {
               textAlign: TextAlign.center,
             ),
           ),
+          // Buttons for user to select the comparison option
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
