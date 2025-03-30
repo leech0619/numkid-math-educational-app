@@ -4,12 +4,14 @@ class GameScreenTemplate extends StatelessWidget {
   final String title; // Title of the screen
   final Color appBarColor; // Color of the AppBar
   final Widget body; // Body of the screen
+  final bool showBackButton; // Determines if the back button should be shown
 
   const GameScreenTemplate({
     super.key,
     required this.title,
     required this.appBarColor,
     required this.body,
+    this.showBackButton = true, // Show back button only in topic mode
   });
 
   @override
@@ -24,6 +26,8 @@ class GameScreenTemplate extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading:
+            showBackButton, // Show or hide the back button
         iconTheme: IconThemeData(
           color: Colors.white, // Color of the AppBar icons
           size: iconSize, // Size of the AppBar icons

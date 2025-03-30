@@ -1,229 +1,192 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:reorderables/reorderables.dart';
-import 'game_screen_template.dart';
-import 'package:collection/collection.dart';
+import '../controller/arcade_controller.dart';
+import '../controller/ordering_controller.dart';
 import '../widgets/correct_dialog.dart';
+import '../widgets/score_dialog.dart';
+import 'game_screen_template.dart';
 
 class OrderingScreen extends StatefulWidget {
-  const OrderingScreen({super.key});
+  final bool isArcadeMode; // Determines if the screen is in arcade mode
+  final VoidCallback? onCorrect; // Callback for arcade mode navigation
+
+  const OrderingScreen({Key? key, this.isArcadeMode = false, this.onCorrect})
+    : super(key: key);
 
   @override
   _OrderingScreenState createState() => _OrderingScreenState();
 }
 
 class _OrderingScreenState extends State<OrderingScreen> {
-  late List<int> _numbers; // List of numbers to be ordered
-  late List<int> _originalNumbers; // Original list of numbers
-  late bool _isAscending; // Boolean to determine if the order is ascending
-  String _resultMessage = ''; // Result message to display
-  Color _resultMessageColor = Colors.transparent; // Color of the result message
-  String _buttonText = 'Check Order'; // Text of the check order button
-  Color _buttonColor = Colors.orange; // Color of the check order button
-
   @override
   void initState() {
     super.initState();
-    _generateRandomNumbers(); // Generate random numbers when the screen is initialized
-  }
 
-  // Generates a list of random numbers and shuffles them
-  void _generateRandomNumbers() {
-    final random = Random();
-    final Set<int> uniqueNumbers = {};
-    while (uniqueNumbers.length < 9) {
-      uniqueNumbers.add(random.nextInt(100) + 1);
-    }
-    _numbers = uniqueNumbers.toList();
-    _originalNumbers = List.from(_numbers);
-    _numbers.shuffle();
-    _isAscending = random.nextBool();
-  }
-
-  // Checks if the numbers are in the correct order
-  void _checkOrder() {
-    List<int> sortedNumbers = List.from(_originalNumbers);
-    if (!_isAscending) {
-      sortedNumbers.sort((a, b) => b.compareTo(a));
-    } else {
-      sortedNumbers.sort((a, b) => a.compareTo(b));
-    }
-
-    if (ListEquality().equals(_numbers, sortedNumbers)) {
-      setState(() {
-        _resultMessage = 'Correct!';
-        _resultMessageColor = Colors.green;
-        _buttonText = '✓';
-        _buttonColor = Colors.lightGreenAccent;
-      });
-      Future.delayed(Duration(seconds: 1), () {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return CorrectDialog(
-              title: 'CORRECT!',
-              content: 'You have arranged the numbers correctly.',
-              dialogBackgroundColor: Colors.orange,
-              onNewGame: () {
-                Navigator.of(context).pop();
-                setState(() {
-                  _generateRandomNumbers();
-                  _resultMessage = '';
-                  _resultMessageColor = Colors.transparent;
-                  _buttonText = 'Check Order';
-                  _buttonColor = Colors.orange;
-                });
-              },
-              onHome: () {
-                Navigator.of(context).popUntil((route) => route.isFirst);
-              },
-            );
-          },
-        );
-      });
-    } else {
-      String hint = _generateHint(sortedNumbers);
-      setState(() {
-        _resultMessage = 'Hint: $hint';
-        _resultMessageColor = Colors.red;
-        _buttonText = '❌';
-        _buttonColor = Colors.grey;
-      });
-      Future.delayed(Duration(seconds: 1), () {
-        setState(() {
-          _buttonText = 'Check Order';
-          _buttonColor = Colors.orange;
-        });
-      });
-    }
-  }
-
-  // Generates a hint message to help the user
-  String _generateHint(List<int> sortedNumbers) {
-    for (int i = 0; i < _numbers.length - 1; i++) {
-      if (_isAscending) {
-        if (_numbers[i] > _numbers[i + 1]) {
-          return '${_numbers[i]} should be before ${_numbers[i + 1]}';
-        }
-      } else {
-        if (_numbers[i] < _numbers[i + 1]) {
-          return '${_numbers[i]} should be after ${_numbers[i + 1]}';
-        }
-      }
-    }
-    return 'Check the order again.';
+    // Reset the state when the screen is first opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = Provider.of<OrderingController>(
+        context,
+        listen: false,
+      );
+      controller.resetGame();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return GameScreenTemplate(
-      title: 'Ordering',
-      appBarColor: Colors.orange,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          double spacing = constraints.maxWidth > 600 ? 20.0 : 10.0;
-          double runSpacing = constraints.maxWidth > 600 ? 30.0 : 20.0;
-          double padding = constraints.maxWidth > 600 ? 60.0 : 30.0;
-          double buttonWidth = constraints.maxWidth > 600 ? 300.0 : 200.0;
-          double buttonHeight = constraints.maxWidth > 600 ? 80.0 : 60.0;
-          double fontSize =
-              constraints.maxWidth > 600
-                  ? 30
-                  : constraints.maxWidth > 400
-                  ? 25
-                  : 20;
-          double resultFontSize =
-              constraints.maxWidth > 600
-                  ? 30
-                  : constraints.maxWidth > 400
-                  ? 25
-                  : 20;
+    final controller = Provider.of<OrderingController>(context);
+    final arcadeController = Provider.of<ArcadeController>(context);
 
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: 20),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: padding),
-                color: Colors.white.withValues(alpha: 0.8),
-                child: Text(
-                  'Arrange the numbers in ${_isAscending ? 'ascending' : 'descending'} order.',
-                  style: TextStyle(
-                    fontSize: fontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              Container(
-                alignment: Alignment.center,
-                child: ReorderableWrap(
-                  maxMainAxisCount: 3,
-                  alignment: WrapAlignment.center,
-                  needsLongPressDraggable: false,
-                  spacing: spacing,
-                  runSpacing: runSpacing,
-                  padding: EdgeInsets.fromLTRB(padding, 40, padding, 30),
-                  children: _buildNumberWidgets(),
-                  onReorder: (int oldIndex, int newIndex) {
-                    setState(() {
-                      if (newIndex > oldIndex) {
-                        newIndex -= 1;
+    final Size screenSize = MediaQuery.of(context).size;
+
+    double spacing = screenSize.width > 600 ? 20.0 : 10.0;
+    double runSpacing = screenSize.width > 600 ? 30.0 : 20.0;
+    double padding = screenSize.width > 600 ? 60.0 : 30.0;
+    double buttonWidth = screenSize.width > 600 ? 300.0 : 200.0;
+    double buttonHeight = screenSize.width > 600 ? 80.0 : 60.0;
+    double fontSize =
+        screenSize.width > 600
+            ? 30
+            : screenSize.width > 400
+            ? 25
+            : 20;
+
+    return GameScreenTemplate(
+      title:
+          widget.isArcadeMode
+              ? 'Score: ${arcadeController.score}' // Display current score in arcade mode
+              : 'Comparing', // Default title for topic mode
+      appBarColor: Colors.orange,
+      showBackButton:
+          !widget.isArcadeMode, // Show back button only in topic mode
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(height: 20),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: padding),
+            color: Colors.white.withValues(alpha: 0.5),
+            child: Text(
+              'Arrange the numbers in ${controller.isAscending ? 'ascending' : 'descending'} order.',
+              style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Container(
+            alignment: Alignment.center,
+            child: ReorderableWrap(
+              maxMainAxisCount: 3,
+              alignment: WrapAlignment.center,
+              needsLongPressDraggable: false,
+              spacing: spacing,
+              runSpacing: runSpacing,
+              padding: EdgeInsets.fromLTRB(padding, 40, padding, 30),
+              onReorder: controller.reorderNumbers,
+              children:
+                  controller.numbers
+                      .map((number) => _buildNumberWidget(number))
+                      .toList(),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(30),
+            child: SizedBox(
+              width: buttonWidth,
+              height: buttonHeight,
+              child: ElevatedButton(
+                onPressed: () {
+                  controller.checkOrder(
+                    () {
+                      // Correct answer logic
+                      if (widget.isArcadeMode) {
+                        arcadeController.increaseScore(); // Increment the score
+                        if (widget.onCorrect != null) {
+                          widget.onCorrect!();
+                        }
+                      } else {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return CorrectDialog(
+                              title: 'CORRECT!',
+                              content:
+                                  'You have arranged the numbers correctly.',
+                              dialogBackgroundColor: Colors.orange,
+                              onNewGame: () {
+                                Navigator.of(context).pop();
+                                controller.generateRandomNumbers();
+                              },
+                              onHome: () {
+                                Navigator.of(
+                                  context,
+                                ).popUntil((route) => route.isFirst);
+                              },
+                            );
+                          },
+                        );
                       }
-                      final int item = _numbers.removeAt(oldIndex);
-                      _numbers.insert(newIndex, item);
-                    });
-                  },
+                    },
+                    () {
+                      // Wrong answer logic
+                      if (widget.isArcadeMode) {
+                        arcadeController
+                            .updateHighestScore(); // Update the highest score
+                        showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (BuildContext context) {
+                            return ScoreDialog(
+                              title: 'Game Over!',
+                              score: arcadeController.score,
+                              onHome: () {
+                                Navigator.of(
+                                  context,
+                                ).popUntil((route) => route.isFirst);
+                                arcadeController
+                                    .resetScore(); // Reset the score after navigating home
+                              },
+                            );
+                          },
+                        );
+                      }
+                    },
+                    widget.isArcadeMode,
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: controller.buttonColor,
+                  foregroundColor: Colors.white,
+                  textStyle: TextStyle(fontSize: 20),
                 ),
+                child: Text(controller.buttonText),
               ),
-              Container(
-                padding: EdgeInsets.all(30),
-                child: SizedBox(
-                  width: buttonWidth,
-                  height: buttonHeight,
-                  child: ElevatedButton(
-                    onPressed: _checkOrder,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _buttonColor,
-                      foregroundColor: Colors.white,
-                      textStyle: TextStyle(fontSize: 20),
-                    ),
-                    child: Text(_buttonText),
-                  ),
+            ),
+          ),
+          Visibility(
+            visible: controller.resultMessage.isNotEmpty,
+            child: Container(
+              color: Colors.white.withValues(alpha: 0.5),
+              padding: EdgeInsets.all(10),
+              alignment: Alignment.center,
+              child: Text(
+                controller.resultMessage,
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.bold,
+                  color: controller.resultMessageColor,
                 ),
+                textAlign: TextAlign.center,
               ),
-              Visibility(
-                visible: _resultMessage.isNotEmpty,
-                child: Container(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  padding: EdgeInsets.all(10),
-                  alignment: Alignment.center,
-                  child: Text(
-                    _resultMessage,
-                    style: TextStyle(
-                      fontSize: resultFontSize,
-                      fontWeight: FontWeight.bold,
-                      color: _resultMessageColor,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  // Builds the list of number widgets
-  List<Widget> _buildNumberWidgets() {
-    return _numbers.map((number) => _buildNumberWidget(number)).toList();
-  }
-
-  // Builds a single number widget
   Widget _buildNumberWidget(int number) {
     return Container(
       key: ValueKey(number),

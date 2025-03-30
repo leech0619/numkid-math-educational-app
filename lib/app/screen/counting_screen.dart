@@ -1,110 +1,75 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'game_screen_template.dart';
+import 'package:provider/provider.dart';
+import '../controller/arcade_controller.dart';
+import '../controller/counting_controller.dart';
 import '../widgets/choice_button.dart';
 import '../widgets/flip_card.dart';
-import 'package:flutter_flip_card/flutter_flip_card.dart';
 import '../widgets/correct_dialog.dart';
+import '../widgets/score_dialog.dart';
+import 'game_screen_template.dart';
 
 class CountingScreen extends StatefulWidget {
-  const CountingScreen({super.key});
+  final bool isArcadeMode; // Determines if the screen is in arcade mode
+  final VoidCallback? onCorrect; // Callback for arcade mode navigation
+
+  const CountingScreen({super.key, this.isArcadeMode = false, this.onCorrect});
 
   @override
   _CountingScreenState createState() => _CountingScreenState();
 }
 
 class _CountingScreenState extends State<CountingScreen> {
-  final FlipCardController _controller = FlipCardController();
-  late List<int> _options;
-  late int _question;
-  late List<bool> _correctAnswers;
-
   @override
   void initState() {
     super.initState();
-    _generateRandomNumbers();
-  }
 
-  // Generates random numbers for the options and selects a random question
-  void _generateRandomNumbers() {
-    final random = Random();
-    final Set<int> uniqueNumbers = {};
-    while (uniqueNumbers.length < 4) {
-      uniqueNumbers.add(random.nextInt(20) + 1);
-    }
-    _options = uniqueNumbers.toList();
-    _question = _options[random.nextInt(4)];
-    _correctAnswers = List.filled(4, false);
-  }
-
-  // Handles button press events and checks if the selected option is correct
-  void _handleButtonPress(BuildContext context, int option, int index) {
-    if (option == _question) {
-      setState(() {
-        _correctAnswers[index] = true;
-      });
-      Future.delayed(Duration(seconds: 1), () {
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context) {
-            return CorrectDialog(
-              title: 'CORRECT!',
-              content: 'The answer is ${_options[index]}.',
-              dialogBackgroundColor: Colors.green,
-              onNewGame: () {
-                Navigator.of(context).pop();
-                setState(() {
-                  _generateRandomNumbers();
-                });
-              },
-              onHome: () {
-                Navigator.of(context).popUntil((route) => route.isFirst);
-              },
-            );
-          },
-        );
-      });
-    } else {
-      setState(() {
-        _options[index] = -1;
-      });
-      Future.delayed(Duration(seconds: 1), () {
-        setState(() {
-          _options[index] = option;
-        });
-      });
-    }
+    // Reset the state when the screen is first opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = Provider.of<CountingController>(
+        context,
+        listen: false,
+      );
+      controller.resetGame();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final controller = Provider.of<CountingController>(context);
+    final arcadeController = Provider.of<ArcadeController>(context);
+
     final Size screenSize = MediaQuery.of(context).size;
     final double fontSize = screenSize.width > 600 ? 30 : 20;
 
     return GameScreenTemplate(
-      title: 'Counting',
+      title:
+          widget.isArcadeMode
+              ? 'Score: ${arcadeController.score}' // Display current score in arcade mode
+              : 'Comparing', // Default title for topic mode
       appBarColor: Colors.green,
+      showBackButton:
+          !widget.isArcadeMode, // Show back button only in topic mode
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(height: 20),
           // Flip card displaying the question
           FlipCardWidget(
-            controller: _controller,
+            controller: controller.flipCardController,
             front: Container(
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.green, width: 3),
                 borderRadius: BorderRadius.circular(10),
                 image: DecorationImage(
-                  image: AssetImage('assets/numbers/$_question.png'),
+                  image: AssetImage(
+                    'assets/numbers/${controller.question}.png',
+                  ),
                   fit: BoxFit.cover,
                 ),
               ),
             ),
             back: Container(
-              padding: EdgeInsets.symmetric(horizontal: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 5),
               decoration: BoxDecoration(
                 color: Colors.lightGreenAccent,
                 border: Border.all(color: Colors.green, width: 3),
@@ -126,8 +91,8 @@ class _CountingScreenState extends State<CountingScreen> {
           SizedBox(height: 10),
           // Hint message for the user
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            color: Colors.white.withValues(alpha: 0.8),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            color: Colors.white.withValues(alpha: 0.5),
             child: Text(
               'The number of tigers is ___.\n(Hint: Click on the image)',
               style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
@@ -137,23 +102,87 @@ class _CountingScreenState extends State<CountingScreen> {
           // Grid of choice buttons
           Expanded(
             child: GridView.count(
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: screenSize.width > 600 ? 3 : 2,
               crossAxisSpacing: 40,
               mainAxisSpacing: 20,
-              padding: EdgeInsets.all(50),
-              children: List.generate(_options.length, (index) {
-                final option = _options[index];
+              padding: const EdgeInsets.all(50),
+              children: List.generate(controller.options.length, (index) {
+                final option = controller.options[index];
                 return ChoiceButton(
                   title:
-                      _correctAnswers[index]
+                      controller.correctAnswers[index]
                           ? '✓'
                           : (option == -1 ? '❌' : option.toString()),
                   color:
-                      _correctAnswers[index]
+                      controller.correctAnswers[index]
                           ? Colors.lightGreenAccent
                           : (option == -1 ? Colors.grey : Colors.green),
-                  onPressed: () => _handleButtonPress(context, option, index),
+                  onPressed: () {
+                    controller.handleButtonPress(
+                      context,
+                      option,
+                      index,
+                      () {
+                        // Correct answer logic
+                        if (widget.isArcadeMode) {
+                          arcadeController
+                              .increaseScore(); // Increment the score
+                          if (widget.onCorrect != null) {
+                            widget.onCorrect!();
+                          }
+                        } else {
+                          // Topic mode: Show the correct dialog
+                          showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return CorrectDialog(
+                                title: 'CORRECT!',
+                                content:
+                                    'The answer is ${controller.question}.',
+                                dialogBackgroundColor: Colors.green,
+                                onNewGame: () {
+                                  Navigator.of(context).pop();
+                                  controller.resetGame();
+                                },
+                                onHome: () {
+                                  Navigator.of(
+                                    context,
+                                  ).popUntil((route) => route.isFirst);
+                                },
+                              );
+                            },
+                          );
+                        }
+                      },
+                      () {
+                        // Wrong answer logic
+                        if (widget.isArcadeMode) {
+                          arcadeController
+                              .updateHighestScore(); // Update the highest score
+                          showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return ScoreDialog(
+                                title: 'Game Over!',
+                                score: arcadeController.score,
+                                onHome: () {
+                                  Navigator.of(
+                                    context,
+                                  ).popUntil((route) => route.isFirst);
+                                  arcadeController
+                                      .resetScore(); // Reset the score after game over
+                                },
+                              );
+                            },
+                          );
+                        }
+                      },
+                      widget.isArcadeMode,
+                    );
+                  },
                   textStyle: TextStyle(fontSize: fontSize),
                 );
               }),

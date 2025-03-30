@@ -1,97 +1,43 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'game_screen_template.dart';
+import 'package:provider/provider.dart';
+import '../controller/comparing_controller.dart';
+import '../controller/arcade_controller.dart';
 import '../widgets/choice_button.dart';
 import '../widgets/flip_card.dart';
-import 'package:flutter_flip_card/flutter_flip_card.dart';
 import '../widgets/correct_dialog.dart';
+import '../widgets/score_dialog.dart';
+import 'game_screen_template.dart';
 
 class ComparingScreen extends StatefulWidget {
-  const ComparingScreen({super.key});
+  final bool isArcadeMode; // Determines if the screen is in arcade mode
+  final VoidCallback? onCorrect; // Callback for arcade mode navigation
+
+  const ComparingScreen({Key? key, this.isArcadeMode = false, this.onCorrect})
+    : super(key: key);
 
   @override
   _ComparingScreenState createState() => _ComparingScreenState();
 }
 
 class _ComparingScreenState extends State<ComparingScreen> {
-  final FlipCardController _controller1 = FlipCardController();
-  final FlipCardController _controller2 = FlipCardController();
-  late int _question1;
-  late int _question2;
-  late List<String> _buttonStates;
-
   @override
   void initState() {
     super.initState();
-    _generateRandomNumbers();
-  }
 
-  // Generates random numbers for the comparison questions
-  void _generateRandomNumbers() {
-    final random = Random();
-    _question1 = random.nextInt(20) + 1;
-    _question2 = random.nextInt(20) + 1;
-    _buttonStates = List.filled(3, '');
-  }
-
-  // Handles button press events and checks if the selected option is correct
-  void _handleButtonPress(BuildContext context, String option, int index) {
-    bool isCorrect = false;
-    String comparison = '';
-    if (option == 'Greater than' && _question1 > _question2) {
-      isCorrect = true;
-      comparison = 'greater than';
-    } else if (option == 'Less than' && _question1 < _question2) {
-      isCorrect = true;
-      comparison = 'less than';
-    } else if (option == 'Equal To' && _question1 == _question2) {
-      isCorrect = true;
-      comparison = 'equal to';
-    }
-
-    if (isCorrect) {
-      // If the answer is correct, update the button state and show a dialog
-      setState(() {
-        _buttonStates[index] = '✓';
-      });
-      Future.delayed(Duration(seconds: 1), () {
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context) {
-            return CorrectDialog(
-              title: 'CORRECT!',
-              content: '$_question1 is $comparison $_question2.',
-              dialogBackgroundColor: Colors.red,
-              onNewGame: () {
-                Navigator.of(context).pop();
-                setState(() {
-                  _generateRandomNumbers();
-                });
-              },
-              onHome: () {
-                Navigator.of(context).popUntil((route) => route.isFirst);
-              },
-            );
-          },
-        );
-      });
-    } else {
-      // If the answer is incorrect, provide feedback and reset the button state
-      setState(() {
-        _buttonStates[index] = '❌';
-      });
-      Future.delayed(Duration(seconds: 1), () {
-        setState(() {
-          _buttonStates[index] = '';
-        });
-      });
-    }
+    // Reset the state when the screen is first opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = Provider.of<ComparingController>(
+        context,
+        listen: false,
+      );
+      controller.resetGame();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final controller = Provider.of<ComparingController>(context);
+    final arcadeController = Provider.of<ArcadeController>(context);
     final Size screenSize = MediaQuery.of(context).size;
     final double fontSize = screenSize.width > 600 ? 30 : 20;
     final double flipFont = screenSize.width > 600 ? 40 : 30;
@@ -99,8 +45,13 @@ class _ComparingScreenState extends State<ComparingScreen> {
     final double buttonHeight = screenSize.width > 600 ? 90 : 70;
 
     return GameScreenTemplate(
-      title: 'Comparing',
+      title:
+          widget.isArcadeMode
+              ? 'Score: ${arcadeController.score}' // Display current score in arcade mode
+              : 'Comparing', // Default title for topic mode
       appBarColor: Colors.red,
+      showBackButton:
+          !widget.isArcadeMode, // Show back button only in topic mode
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -110,9 +61,9 @@ class _ComparingScreenState extends State<ComparingScreen> {
             children: [
               // First flip card displaying the first question number
               FlipCardWidget(
-                controller: _controller1,
+                controller: controller.controller1,
                 front: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
                   decoration: BoxDecoration(
                     color: Colors.redAccent[100],
                     border: Border.all(color: Colors.red, width: 3),
@@ -120,7 +71,7 @@ class _ComparingScreenState extends State<ComparingScreen> {
                   ),
                   child: Center(
                     child: Text(
-                      '$_question1',
+                      '${controller.question1}',
                       style: TextStyle(
                         fontSize: flipFont,
                         fontWeight: FontWeight.bold,
@@ -134,7 +85,9 @@ class _ComparingScreenState extends State<ComparingScreen> {
                     border: Border.all(color: Colors.red, width: 3),
                     borderRadius: BorderRadius.circular(10),
                     image: DecorationImage(
-                      image: AssetImage('assets/numbers/$_question1.png'),
+                      image: AssetImage(
+                        'assets/numbers/${controller.question1}.png',
+                      ),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -142,9 +95,9 @@ class _ComparingScreenState extends State<ComparingScreen> {
               ),
               // Second flip card displaying the second question number
               FlipCardWidget(
-                controller: _controller2,
+                controller: controller.controller2,
                 front: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
                   decoration: BoxDecoration(
                     color: Colors.redAccent[100],
                     border: Border.all(color: Colors.red, width: 3),
@@ -152,7 +105,7 @@ class _ComparingScreenState extends State<ComparingScreen> {
                   ),
                   child: Center(
                     child: Text(
-                      '$_question2',
+                      '${controller.question2}',
                       style: TextStyle(
                         fontSize: flipFont,
                         fontWeight: FontWeight.bold,
@@ -166,7 +119,9 @@ class _ComparingScreenState extends State<ComparingScreen> {
                     border: Border.all(color: Colors.red, width: 3),
                     borderRadius: BorderRadius.circular(10),
                     image: DecorationImage(
-                      image: AssetImage('assets/numbers/$_question2.png'),
+                      image: AssetImage(
+                        'assets/numbers/${controller.question2}.png',
+                      ),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -177,10 +132,10 @@ class _ComparingScreenState extends State<ComparingScreen> {
           SizedBox(height: 10),
           // Hint message for the user
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            color: Colors.white.withValues(alpha: 0.8),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            color: Colors.white.withValues(alpha: 0.5),
             child: Text(
-              '$_question1 is ______ $_question2\n(Hint: Click on the image)',
+              '${controller.question1} is ______ ${controller.question2}\n(Hint: Click on the image)',
               style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
@@ -189,62 +144,96 @@ class _ComparingScreenState extends State<ComparingScreen> {
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: buttonWidth,
-                  height: buttonHeight,
-                  child: ChoiceButton(
-                    title:
-                        _buttonStates[0] == ''
-                            ? 'Greater than'
-                            : _buttonStates[0],
-                    color:
-                        _buttonStates[0] == '✓'
-                            ? Colors.lightGreenAccent
-                            : (_buttonStates[0] == '❌'
-                                ? Colors.grey
-                                : Colors.red),
-                    onPressed:
-                        () => _handleButtonPress(context, 'Greater than', 0),
-                    textStyle: TextStyle(fontSize: fontSize),
+              children: List.generate(3, (index) {
+                final titles = ['Greater than', 'Less than', 'Equal To'];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: SizedBox(
+                    width: buttonWidth,
+                    height: buttonHeight,
+                    child: ChoiceButton(
+                      title:
+                          controller.buttonStates[index] == ''
+                              ? titles[index]
+                              : controller.buttonStates[index],
+                      color:
+                          controller.buttonStates[index] == '✓'
+                              ? Colors.lightGreenAccent
+                              : (controller.buttonStates[index] == '❌'
+                                  ? Colors.grey
+                                  : Colors.red),
+                      onPressed: () {
+                        controller.handleButtonPress(
+                          context,
+                          titles[index],
+                          index,
+                          () {
+                            // Correct answer logic
+                            if (widget.isArcadeMode) {
+                              arcadeController
+                                  .increaseScore(); // Increment the score
+                              // Arcade mode: Navigate to a new random game
+                              if (widget.onCorrect != null) {
+                                widget.onCorrect!();
+                              }
+                            } else {
+                              // Topic mode: Show the correct dialog
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return CorrectDialog(
+                                    title: 'CORRECT!',
+                                    content:
+                                        '${controller.question1} is ${titles[index]} ${controller.question2}.',
+                                    dialogBackgroundColor: Colors.red,
+                                    onNewGame: () {
+                                      Navigator.of(context).pop();
+                                      controller.resetGame();
+                                    },
+                                    onHome: () {
+                                      Navigator.of(
+                                        context,
+                                      ).popUntil((route) => route.isFirst);
+                                    },
+                                  );
+                                },
+                              );
+                            }
+                          },
+                          () {
+                            // Wrong answer logic
+                            if (widget.isArcadeMode) {
+                              arcadeController
+                                  .updateHighestScore(); // Update the highest score
+                              // Arcade mode: Show the ScoreDialog
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return ScoreDialog(
+                                    title: 'Game Over!',
+                                    score: arcadeController.score,
+                                    onHome: () {
+                                      Navigator.of(
+                                        context,
+                                      ).popUntil((route) => route.isFirst);
+                                      arcadeController
+                                          .resetScore(); // Reset the score after navigating home
+                                    },
+                                  );
+                                },
+                              );
+                            }
+                          },
+                          widget.isArcadeMode, // Pass arcade mode flag
+                        );
+                      },
+                      textStyle: TextStyle(fontSize: fontSize),
+                    ),
                   ),
-                ),
-                SizedBox(height: 20),
-                SizedBox(
-                  width: buttonWidth,
-                  height: buttonHeight,
-                  child: ChoiceButton(
-                    title:
-                        _buttonStates[1] == '' ? 'Less than' : _buttonStates[1],
-                    color:
-                        _buttonStates[1] == '✓'
-                            ? Colors.lightGreenAccent
-                            : (_buttonStates[1] == '❌'
-                                ? Colors.grey
-                                : Colors.red),
-                    onPressed:
-                        () => _handleButtonPress(context, 'Less than', 1),
-                    textStyle: TextStyle(fontSize: fontSize),
-                  ),
-                ),
-                SizedBox(height: 20),
-                SizedBox(
-                  width: buttonWidth,
-                  height: buttonHeight,
-                  child: ChoiceButton(
-                    title:
-                        _buttonStates[2] == '' ? 'Equal To' : _buttonStates[2],
-                    color:
-                        _buttonStates[2] == '✓'
-                            ? Colors.lightGreenAccent
-                            : (_buttonStates[2] == '❌'
-                                ? Colors.grey
-                                : Colors.red),
-                    onPressed: () => _handleButtonPress(context, 'Equal To', 2),
-                    textStyle: TextStyle(fontSize: fontSize),
-                  ),
-                ),
-              ],
+                );
+              }),
             ),
           ),
         ],

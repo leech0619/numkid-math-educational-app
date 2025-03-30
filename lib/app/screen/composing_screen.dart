@@ -1,223 +1,199 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'game_screen_template.dart';
+import 'package:provider/provider.dart';
+import '../controller/composing_controller.dart';
+import '../controller/arcade_controller.dart';
 import '../widgets/choice_button.dart';
 import '../widgets/correct_dialog.dart';
+import '../widgets/score_dialog.dart';
+import 'game_screen_template.dart';
 
 class ComposingScreen extends StatefulWidget {
-  const ComposingScreen({super.key});
+  final bool isArcadeMode; // Determines if the screen is in arcade mode
+  final VoidCallback? onCorrect; // Callback for arcade mode navigation
+
+  const ComposingScreen({Key? key, this.isArcadeMode = false, this.onCorrect})
+    : super(key: key);
 
   @override
   _ComposingScreenState createState() => _ComposingScreenState();
 }
 
 class _ComposingScreenState extends State<ComposingScreen> {
-  late int targetNumber;
-  late List<int> choices;
-  List<int> selectedNumbers = [];
-  late List<bool?> _correctAnswers;
-  String _hintMessage = '';
-
   @override
   void initState() {
     super.initState();
-    generateNewProblem();
-  }
 
-  // Generates a new problem with a target number and choices
-  void generateNewProblem() {
-    final random = Random();
-    targetNumber = random.nextInt(100); // Random target number between 0 and 99
-
-    // Generate two numbers that add up to the target number
-    int num1 = random.nextInt(targetNumber + 1);
-    int num2 = targetNumber - num1;
-
-    // Ensure there are at least 6 unique numbers in the choices
-    Set<int> uniqueNumbers = {num1, num2};
-    while (uniqueNumbers.length < 6) {
-      uniqueNumbers.add(random.nextInt(100));
-    }
-    choices = uniqueNumbers.toList()..shuffle();
-
-    selectedNumbers.clear();
-    _correctAnswers = List.filled(6, null);
-    _hintMessage = '';
-  }
-
-  // Checks if the selected numbers add up to the target number
-  void checkAnswer() {
-    if (selectedNumbers.length == 2) {
-      final sum = selectedNumbers[0] + selectedNumbers[1];
-      final isCorrect = sum == targetNumber;
-      showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder:
-            (context) => CorrectDialog(
-              title: isCorrect ? 'CORRECT!' : 'Try Again!',
-              content:
-                  isCorrect
-                      ? 'You found the correct pair!'
-                      : 'The sum of ${selectedNumbers[0]} and ${selectedNumbers[1]} is not $targetNumber.',
-              dialogBackgroundColor: isCorrect ? Colors.green : Colors.red,
-              onNewGame: () {
-                Navigator.of(context).pop();
-                setState(() {
-                  generateNewProblem();
-                });
-              },
-              onHome: () {
-                Navigator.of(context).popUntil((route) => route.isFirst);
-              },
-            ),
+    // Reset the state when the screen is first opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = Provider.of<ComposingController>(
+        context,
+        listen: false,
       );
-    }
-  }
-
-  // Handles button press events and updates the state accordingly
-  void _handleButtonPress(BuildContext context, int number, int index) {
-    if (selectedNumbers.contains(number)) {
-      setState(() {
-        selectedNumbers.remove(number);
-      });
-    } else {
-      if (selectedNumbers.length < 2) {
-        setState(() {
-          selectedNumbers.add(number);
-        });
-      }
-      if (selectedNumbers.length == 2) {
-        final sum = selectedNumbers[0] + selectedNumbers[1];
-        if (sum == targetNumber) {
-          setState(() {
-            _correctAnswers[choices.indexOf(selectedNumbers[0])] = true;
-            _correctAnswers[choices.indexOf(selectedNumbers[1])] = true;
-            _hintMessage = 'CORRECT!';
-          });
-          Future.delayed(Duration(seconds: 1), () {
-            checkAnswer();
-          });
-        } else {
-          setState(() {
-            _correctAnswers[choices.indexOf(selectedNumbers[0])] = false;
-            _correctAnswers[choices.indexOf(selectedNumbers[1])] = false;
-            _hintMessage =
-                'The sum of ${selectedNumbers[0]} and ${selectedNumbers[1]} is not $targetNumber.';
-          });
-          Future.delayed(Duration(seconds: 1), () {
-            setState(() {
-              _correctAnswers[choices.indexOf(selectedNumbers[0])] = null;
-              _correctAnswers[choices.indexOf(selectedNumbers[1])] = null;
-              selectedNumbers.clear();
-            });
-          });
-        }
-      }
-    }
+      controller.resetGame();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        double screenWidth = constraints.maxWidth;
-        double fontSize =
-            screenWidth > 600
-                ? 30
-                : screenWidth > 400
-                ? 25
-                : 20;
-        double spacing = screenWidth > 600 ? 40 : 30;
+    final controller = Provider.of<ComposingController>(context);
+    final arcadeController = Provider.of<ArcadeController>(context);
+    final Size screenSize = MediaQuery.of(context).size;
+    final double fontSize = screenSize.width > 600 ? 30 : 20;
+    final double spacing = screenSize.width > 600 ? 40 : 30;
 
-        return GameScreenTemplate(
-          title: 'Composing',
-          appBarColor: Colors.purple,
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(height: spacing),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: spacing),
-                color: Colors.white.withValues(alpha: 0.8),
-                child: Text(
-                  'Select two numbers that add up to the target number.',
-                  style: TextStyle(
-                    fontSize: fontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              SizedBox(height: spacing),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.purpleAccent,
-                ),
-                child: Text(
-                  'Target Number: $targetNumber',
-                  style: TextStyle(
-                    fontSize: fontSize,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              SizedBox(height: spacing),
-              // Grid of choice buttons
-              GridView.count(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                crossAxisCount: screenWidth > 600 ? 4 : 3,
-                crossAxisSpacing: spacing,
-                mainAxisSpacing: spacing,
-                padding: EdgeInsets.all(spacing),
-                children: List.generate(choices.length, (index) {
-                  final number = choices[index];
-                  final isSelected = selectedNumbers.contains(number);
-                  return ChoiceButton(
-                    title:
-                        _correctAnswers[index] == true
-                            ? '✓'
-                            : (_correctAnswers[index] == false
-                                ? '❌'
-                                : number.toString()),
-                    color:
-                        _correctAnswers[index] == true
-                            ? Colors.lightGreenAccent
-                            : (_correctAnswers[index] == false
-                                ? Colors.grey
-                                : (isSelected ? Colors.purple : Colors.grey)),
-                    onPressed: () => _handleButtonPress(context, number, index),
-                    textStyle: TextStyle(fontSize: fontSize),
-                  );
-                }),
-              ),
-              // Hint message for the user
-              if (_hintMessage.isNotEmpty)
-                Container(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  child: Text(
-                    _hintMessage,
-                    style: TextStyle(
-                      fontSize: fontSize,
-                      fontWeight: FontWeight.bold,
-                      color:
-                          _hintMessage == 'CORRECT!'
-                              ? Colors.green
-                              : Colors.red,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-            ],
+    return GameScreenTemplate(
+      title:
+          widget.isArcadeMode
+              ? 'Score: ${arcadeController.score}' // Display current score in arcade mode
+              : 'Comparing', // Default title for topic mode
+      appBarColor: Colors.purple,
+      showBackButton:
+          !widget.isArcadeMode, // Show back button only in topic mode
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(height: spacing),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: spacing),
+            color: Colors.white.withValues(alpha: 0.5),
+            child: Text(
+              'Select two numbers that add up to the target number.',
+              style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
           ),
-        );
-      },
+          SizedBox(height: spacing),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.purpleAccent,
+            ),
+            child: Text(
+              'Target Number: ${controller.targetNumber}',
+              style: TextStyle(
+                fontSize: fontSize,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(height: spacing),
+          // Grid of choice buttons
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: screenSize.width > 600 ? 4 : 3,
+            crossAxisSpacing: spacing,
+            mainAxisSpacing: spacing,
+            padding: EdgeInsets.all(spacing),
+            children: List.generate(controller.choices.length, (index) {
+              final number = controller.choices[index];
+              final isSelected = controller.selectedNumbers.contains(number);
+              return ChoiceButton(
+                title:
+                    controller.correctAnswers[index] == true
+                        ? '✓'
+                        : (controller.correctAnswers[index] == false
+                            ? '❌'
+                            : number.toString()),
+                color:
+                    controller.correctAnswers[index] == true
+                        ? Colors.lightGreenAccent
+                        : (controller.correctAnswers[index] == false
+                            ? Colors.grey
+                            : (isSelected ? Colors.purple : Colors.grey)),
+                onPressed: () {
+                  controller.handleButtonPress(number);
+                  if (controller.selectedNumbers.length == 2) {
+                    controller.checkAnswer(
+                      () {
+                        // Correct answer logic
+                        if (widget.isArcadeMode) {
+                          arcadeController
+                              .increaseScore(); // Increment the score
+                          // Arcade mode: Navigate to a new random game
+                          if (widget.onCorrect != null) {
+                            widget.onCorrect!();
+                          }
+                        } else {
+                          // Topic mode: Show the correct dialog
+                          showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return CorrectDialog(
+                                title: 'CORRECT!',
+                                content: 'You found the correct pair!',
+                                dialogBackgroundColor: Colors.green,
+                                onNewGame: () {
+                                  Navigator.of(context).pop();
+                                  controller.generateNewProblem();
+                                },
+                                onHome: () {
+                                  Navigator.of(
+                                    context,
+                                  ).popUntil((route) => route.isFirst);
+                                },
+                              );
+                            },
+                          );
+                        }
+                      },
+                      () {
+                        // Wrong answer logic
+                        if (widget.isArcadeMode) {
+                          arcadeController
+                              .updateHighestScore(); // Update the highest score
+
+                          // Arcade mode: Show the ScoreDialog
+                          showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return ScoreDialog(
+                                title: 'Game Over!',
+                                score: arcadeController.score,
+                                onHome: () {
+                                  Navigator.of(
+                                    context,
+                                  ).popUntil((route) => route.isFirst);
+                                  arcadeController
+                                      .resetScore(); // Reset the score after game over
+                                },
+                              );
+                            },
+                          );
+                        }
+                      },
+                    );
+                  }
+                },
+                textStyle: TextStyle(fontSize: fontSize),
+              );
+            }),
+          ),
+          // Hint message for the user
+          if (controller.hintMessage.isNotEmpty)
+            Container(
+              color: Colors.white.withValues(alpha: 0.5),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: Text(
+                controller.hintMessage,
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.bold,
+                  color:
+                      controller.hintMessage == 'CORRECT!'
+                          ? Colors.green
+                          : Colors.red,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

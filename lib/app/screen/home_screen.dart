@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:numkid/app/screen/comparing_screen.dart';
 import 'package:numkid/app/screen/composing_screen.dart';
 import 'package:numkid/app/screen/ordering_screen.dart';
+import 'package:numkid/app/screen/arcade_screen.dart';
 import '../widgets/topic_button.dart';
 import 'counting_screen.dart';
+import '../controller/comparing_controller.dart';
+import '../controller/composing_controller.dart';
+import '../controller/ordering_controller.dart';
+import '../controller/counting_controller.dart';
+import '../controller/arcade_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,31 +20,35 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // List of topics with their respective titles, icons, colors, and screens
+  // List of topics with their respective titles, icons, colors, screens, and controllers
   final List<Map<String, dynamic>> topics = [
     {
       'title': 'Counting',
       'icon': Icons.looks_one_outlined,
       'color': Colors.green,
       'screen': CountingScreen(),
+      'controller': CountingController(),
     },
     {
       'title': 'Comparing',
       'icon': Icons.looks_two_outlined,
       'color': Colors.red,
       'screen': ComparingScreen(),
+      'controller': ComparingController(),
     },
     {
       'title': 'Ordering',
       'icon': Icons.looks_3_outlined,
       'color': Colors.orange,
       'screen': OrderingScreen(),
+      'controller': OrderingController(),
     },
     {
       'title': 'Composing',
       'icon': Icons.looks_4_outlined,
       'color': Colors.purple,
       'screen': ComposingScreen(),
+      'controller': ComposingController(),
     },
   ];
 
@@ -124,12 +135,70 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => topics[index]['screen'],
+                              builder:
+                                  (context) => Builder(
+                                    builder:
+                                        (newContext) => ChangeNotifierProvider(
+                                          create:
+                                              (_) =>
+                                                  topics[index]['controller']
+                                                      as ChangeNotifier,
+                                          child: topics[index]['screen'],
+                                        ),
+                                  ),
                             ),
                           );
                         },
                       );
                     },
+                  ),
+                ),
+              ),
+              // Arcade Mode Button (outside Expanded)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 18,
+                      horizontal: 45,
+                    ),
+                    backgroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    side: const BorderSide(color: Colors.yellow, width: 3),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => ChangeNotifierProvider(
+                              create: (_) => ArcadeController(),
+                              child: const ArcadeScreen(),
+                            ),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(
+                        Icons.videogame_asset,
+                        color: Colors.yellow,
+                        size: 30,
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        'Arcade Mode',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.yellow,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -144,13 +213,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   'Developed by Chorng Huah. All rights reserved.',
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: 12,
+                    fontSize: 10,
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
                 ),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 5),
             ],
           ),
         ],
