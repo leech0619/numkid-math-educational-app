@@ -7,11 +7,11 @@ class ScoreDialog extends StatelessWidget {
   final VoidCallback onHome; // Callback for the "Home" button
 
   const ScoreDialog({
-    Key? key,
+    super.key,
     required this.title,
     required this.score,
     required this.onHome,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

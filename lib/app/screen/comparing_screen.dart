@@ -12,8 +12,7 @@ class ComparingScreen extends StatefulWidget {
   final bool isArcadeMode; // Determines if the screen is in arcade mode
   final VoidCallback? onCorrect; // Callback for arcade mode navigation
 
-  const ComparingScreen({Key? key, this.isArcadeMode = false, this.onCorrect})
-    : super(key: key);
+  const ComparingScreen({super.key, this.isArcadeMode = false, this.onCorrect});
 
   @override
   _ComparingScreenState createState() => _ComparingScreenState();

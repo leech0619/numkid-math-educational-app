@@ -45,7 +45,7 @@ class _CountingScreenState extends State<CountingScreen> {
       title:
           widget.isArcadeMode
               ? 'Score: ${arcadeController.score}' // Display current score in arcade mode
-              : 'Comparing', // Default title for topic mode
+              : 'Counting', // Default title for topic mode
       appBarColor: Colors.green,
       showBackButton:
           !widget.isArcadeMode, // Show back button only in topic mode

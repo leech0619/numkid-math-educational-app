@@ -11,8 +11,7 @@ class OrderingScreen extends StatefulWidget {
   final bool isArcadeMode; // Determines if the screen is in arcade mode
   final VoidCallback? onCorrect; // Callback for arcade mode navigation
 
-  const OrderingScreen({Key? key, this.isArcadeMode = false, this.onCorrect})
-    : super(key: key);
+  const OrderingScreen({super.key, this.isArcadeMode = false, this.onCorrect});
 
   @override
   _OrderingScreenState createState() => _OrderingScreenState();

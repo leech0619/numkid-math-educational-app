@@ -6,7 +6,7 @@ import '../utils/audio_service.dart';
 
 /// Arcade screen for displaying the arcade mode UI.
 class ArcadeScreen extends StatefulWidget {
-  const ArcadeScreen({Key? key}) : super(key: key);
+  const ArcadeScreen({super.key});
 
   @override
   State<ArcadeScreen> createState() => _ArcadeScreenState();

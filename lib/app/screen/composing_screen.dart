@@ -11,8 +11,7 @@ class ComposingScreen extends StatefulWidget {
   final bool isArcadeMode; // Determines if the screen is in arcade mode
   final VoidCallback? onCorrect; // Callback for arcade mode navigation
 
-  const ComposingScreen({Key? key, this.isArcadeMode = false, this.onCorrect})
-    : super(key: key);
+  const ComposingScreen({super.key, this.isArcadeMode = false, this.onCorrect});
 
   @override
   _ComposingScreenState createState() => _ComposingScreenState();
@@ -45,7 +44,7 @@ class _ComposingScreenState extends State<ComposingScreen> {
       title:
           widget.isArcadeMode
               ? 'Score: ${arcadeController.score}' // Display current score in arcade mode
-              : 'Comparing', // Default title for topic mode
+              : 'Composing', // Default title for topic mode
       appBarColor: Colors.purple,
       showBackButton:
           !widget.isArcadeMode, // Show back button only in topic mode
